@@ -5,27 +5,32 @@
 ; -- Fill memory with little endian word
 ; --
 ; -- Input:
+; --   ft - value
 ; --   bc - destination
 ; --   de - words to set
-; --   ft - value
 ; --
 		SECTION	"SetMemoryWords",CODE
 SetMemoryWords:
 		pusha
 
-		ld	hl,ft
-		j	.entry
-
-.loop		ld	t,l
-		ld	(bc),t
-		add	bc,1
-		ld	t,h
-		ld	(bc),t
-		add	bc,1
-		sub	de,1
-.entry
 		tst	de
-		j/nz	.loop
+		j/z	.done
+
+		sub	de,1
+		add	d,1
+		add	e,1
+
+		pop	ft
+		push	ft
+		
+		exg	bc,ft
+
+.loop		ld	(ft),c
+		add	ft,1
+		ld	(ft),b
+		add	ft,1
+		dj	e,.loop
+		dj	d,.loop
 		
 .done		popa
 		j	(hl)
