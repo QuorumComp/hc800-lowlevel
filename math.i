@@ -2,8 +2,12 @@
 
 MATH_I_INCLUDED_ = 1
 
-	GLOBAL	SignedMultiply
-	GLOBAL	UnsignedDivide
-	GLOBAL	SignedDivide
+	GLOBAL	MathMultiplySigned
+	GLOBAL	MathDivideUnsigned
+	GLOBAL	MathDivideSigned
+
+	GLOBAL	MathLoadOperand16U
+	GLOBAL	MathAdd_32_32
+	GLOBAL	MathAdd_32_Operand
 
 	ENDC

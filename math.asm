@@ -1,7 +1,7 @@
 		INCLUDE	"hc800.i"
 		INCLUDE	"math.i"
 
-; --
+; ---------------------------------------------------------------------------
 ; -- Multiply two integers
 ; --
 ; -- Inputs:
@@ -11,8 +11,8 @@
 ; -- Outputs:
 ; --   de:ft - 32 bit result
 ; --
-		SECTION	"SignedMultiply",CODE
-SignedMultiply:
+		SECTION	"MathMultiplySigned",CODE
+MathMultiplySigned:
 		push	bc
 
 		ld	b,IO_MATH_BASE
@@ -100,7 +100,7 @@ DIVIDE:		MACRO
 		ENDM
 
 
-; --
+; ---------------------------------------------------------------------------
 ; -- Divide two integers
 ; --
 ; -- Inputs:
@@ -111,11 +111,12 @@ DIVIDE:		MACRO
 ; --   ft - quotient
 ; --   de - remainder
 ; --
-		SECTION	"UnsignedDivide",CODE
-UnsignedDivide:
+		SECTION	"MathDivideUnsigned",CODE
+MathDivideUnsigned:
 		DIVIDE	MATH_OP_UNSIGNED_DIV
 
-; --
+
+; ---------------------------------------------------------------------------
 ; -- Divide two integers
 ; --
 ; -- Inputs:
@@ -126,6 +127,80 @@ UnsignedDivide:
 ; --   ft - quotient
 ; --   de - remainder
 ; --
-		SECTION	"SignedDivide",CODE
-SignedDivide:
+		SECTION	"MathDivideSigned",CODE
+MathDivideSigned:
 		DIVIDE	MATH_OP_SIGNED_DIV
+
+
+; ---------------------------------------------------------------------------
+; -- Add temp to 32 bit integer
+; --
+; -- Inputs:
+; --   bc - pointer to integer #1, and result
+; --
+		SECTION	"MathAdd_32_Operand",CODE
+MathAdd_32_Operand:
+		pusha
+
+		ld	de,temp
+		jal	MathAdd_32_32
+
+		popa
+		j	(hl)
+
+; ---------------------------------------------------------------------------
+; -- Add two 32 bit integers
+; --
+; -- Inputs:
+; --   bc - pointer to integer #1, and result
+; --   de - pointer to integer #2
+; --
+		SECTION	"MathAdd_32_32",CODE
+MathAdd_32_32:
+		pusha
+
+		ld	l,4
+		ld	f,0
+.loop		push	hl
+		ld	t,(bc)
+		ld	l,t
+		ld	h,0
+		add/c	hl,1
+		ld	t,(de)
+		ld	f,0
+		add	ft,hl
+		ld	(bc),t
+		add	bc,1
+		add	de,1
+		pop	hl
+		dj	l,.loop
+
+		popa
+		j	(hl)
+
+
+; ---------------------------------------------------------------------------
+; -- Load 16 bit unsigned integer into temp storage
+; --
+; -- Inputs:
+; --   bc - integer
+; --
+		SECTION	"MathLoadOperand16U",CODE
+MathLoadOperand16U:
+		pusha
+
+		ld	ft,temp
+		ld	(ft),c
+		add	ft,1
+		ld	(ft),b
+		add	ft,1
+		ld	(ft),c
+		add	ft,1
+		ld	(ft),c
+
+		popa
+		j	(hl)
+
+
+		SECTION	"MathVars",BSS
+temp:		DS	4

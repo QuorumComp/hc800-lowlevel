@@ -10,6 +10,8 @@ TIMEOUT_FRAMES	EQU	30
 	GLOBAL	UartByteOutSync
 	GLOBAL	UartWordInSync
 	GLOBAL	UartWordOutSync
+	GLOBAL	UartMemoryOutSync
+	GLOBAL	UartMemoryInSync
 
 
 	ENDC

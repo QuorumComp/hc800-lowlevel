@@ -136,6 +136,57 @@ UartByteOutSync:
 
 
 ; --
+; -- Send memory
+; --
+; -- Inputs:
+; --   bc - memory
+; --   de - length
+; --
+UartMemoryOutSync:
+		pusha
+
+		sub	de,1
+		add	d,1
+		add	e,1
+
+.write_memory	ld	t,(bc)
+		jal	UartByteOutSync
+		add	bc,1
+		dj	e,.write_memory
+		dj	d,.write_memory
+
+		popa
+		j	(hl)
+
+; --
+; -- Receive memory
+; --
+; -- Inputs:
+; --   bc - memory
+; --   de - length
+; --
+; -- Outputs:
+; --    f - "eq" condition if read
+; --
+UartMemoryInSync:
+		pusha
+
+		sub	de,1
+		add	d,1
+		add	e,1
+
+.read_memory	jal	UartByteInSync
+		j/ne	.error
+		ld	(bc),t
+		add	bc,1
+		dj	e,.read_memory
+		dj	d,.read_memory
+.error
+		popa
+		j	(hl)
+
+
+; --
 ; -- Wait for UART write
 ; --
 		SECTION	"UartWaitWrite",CODE
