@@ -162,6 +162,7 @@ MathAdd_32_32:
 		ld	l,4
 		ld	f,0
 .loop		push	hl
+
 		ld	t,(bc)
 		ld	l,t
 		ld	h,0
@@ -172,6 +173,7 @@ MathAdd_32_32:
 		ld	(bc),t
 		add	bc,1
 		add	de,1
+
 		pop	hl
 		dj	l,.loop
 
@@ -183,20 +185,22 @@ MathAdd_32_32:
 ; -- Load 16 bit unsigned integer into temp storage
 ; --
 ; -- Inputs:
-; --   bc - integer
+; --   ft - integer
 ; --
 		SECTION	"MathLoadOperand16U",CODE
 MathLoadOperand16U:
 		pusha
 
-		ld	ft,temp
-		ld	(ft),c
-		add	ft,1
-		ld	(ft),b
-		add	ft,1
-		ld	(ft),c
-		add	ft,1
-		ld	(ft),c
+		ld	bc,temp
+		ld	(bc),t
+		add	bc,1
+		exg	f,t
+		ld	(bc),t
+		add	bc,1
+		ld	t,0
+		ld	(bc),t
+		add	bc,1
+		ld	(bc),t
 
 		popa
 		j	(hl)

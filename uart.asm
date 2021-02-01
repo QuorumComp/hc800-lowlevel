@@ -166,10 +166,11 @@ UartMemoryOutSync:
 ; --   de - length
 ; --
 ; -- Outputs:
+; --    t - error code
 ; --    f - "eq" condition if read
 ; --
 UartMemoryInSync:
-		pusha
+		push	bc-hl
 
 		sub	de,1
 		add	d,1
@@ -181,8 +182,8 @@ UartMemoryInSync:
 		add	bc,1
 		dj	e,.read_memory
 		dj	d,.read_memory
-.error
-		popa
+		
+.error		pop	bc-hl
 		j	(hl)
 
 
@@ -198,7 +199,7 @@ UartWaitWrite:
 .wait		lio	t,(bc)
 		and	t,IO_UART_STATUS_WRITE
 		cmp	t,0
-		j/z	.wait
+		j/eq	.wait
 
 		popa
 		j	(hl)
