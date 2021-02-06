@@ -134,7 +134,6 @@ UartByteOutSync:
 		popa
 		j	(hl)
 
-
 ; --
 ; -- Send memory
 ; --
@@ -142,8 +141,12 @@ UartByteOutSync:
 ; --   bc - memory
 ; --   de - length
 ; --
+		SECTION	"UartMemoryOutSync",CODE
 UartMemoryOutSync:
 		pusha
+
+		tst	de
+		j/eq	.exit
 
 		sub	de,1
 		add	d,1
@@ -155,7 +158,7 @@ UartMemoryOutSync:
 		dj	e,.write_memory
 		dj	d,.write_memory
 
-		popa
+.exit		popa
 		j	(hl)
 
 ; --
@@ -169,21 +172,27 @@ UartMemoryOutSync:
 ; --    t - error code
 ; --    f - "eq" condition if read
 ; --
+		SECTION	"UartMemoryInSync",CODE
 UartMemoryInSync:
 		push	bc-hl
+
+		tst	de
+		j/z	.empty
 
 		sub	de,1
 		add	d,1
 		add	e,1
 
 .read_memory	jal	UartByteInSync
-		j/ne	.error
+		j/ne	.exit
 		ld	(bc),t
 		add	bc,1
 		dj	e,.read_memory
 		dj	d,.read_memory
-		
-.error		pop	bc-hl
+
+.empty		ld	f,FLAGS_EQ
+
+.exit		pop	bc-hl
 		j	(hl)
 
 
