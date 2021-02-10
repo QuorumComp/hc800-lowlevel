@@ -15,16 +15,16 @@
 ; --
 		SECTION	"UartByteIn",CODE
 UartByteIn:
-		push	bc/hl
+		push	hl
 
 		jal	UartCanRead
 		j/ne	.done
 
-		ld	b,IO_UART_BASE
-		ld	c,IO_UART_DATA
-		lio	t,(bc)
+		ld	h,IO_UART_BASE
+		ld	l,IO_UART_DATA
+		lio	t,(hl)
 
-.done		pop	bc/hl
+.done		pop	hl
 		j	(hl)
 
 
@@ -62,16 +62,16 @@ UartByteInSync:
 ; --
 		SECTION	"UartCanRead",CODE
 UartCanRead:
-		push	bc
+		push	hl
 
-		ld	b,IO_UART_BASE
-		ld	c,IO_UART_STATUS
-		lio	t,(bc)
+		ld	h,IO_UART_BASE
+		ld	l,IO_UART_STATUS
+		lio	t,(hl)
 		not	t
 		and	t,IO_UART_STATUS_READ
 		cmp	t,0
 
-		pop	bc
+		pop	hl
 		j	(hl)
 
 
