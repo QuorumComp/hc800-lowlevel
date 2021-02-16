@@ -220,20 +220,22 @@ MathShift_32:
 		and	t,31
 		ld	e,t
 
+		add	bc,3
+
 .shift_byte	cmp	e,8
 		j/ltu	.shift_partial
 
-		add	bc,1
+		sub	bc,1
 		ld	f,3
 .shift_b_loop	ld	t,(bc)
-		sub	bc,1
+		add	bc,1
 		ld	(bc),t
-		add	bc,2
+		sub	bc,2
 		dj	f,.shift_b_loop
-		sub	bc,1
+		add	bc,1
 		ld	t,0
 		ld	(bc),t
-		sub	bc,3
+		add	bc,3
 
 		sub	e,8
 		j	.shift_byte
@@ -241,13 +243,13 @@ MathShift_32:
 .shift_partial	ld	d,3
 .shift_p_loop	ld	t,(bc)
 		exg	f,t
-		add	bc,1
+		sub	bc,1
 		ld	t,(bc)
 		ls	ft,e
 		exg	f,t
-		sub	bc,1
-		ld	(bc),t
 		add	bc,1
+		ld	(bc),t
+		sub	bc,1
 		dj	d,.shift_p_loop
 
 		ld	t,(bc)
