@@ -24,4 +24,21 @@ FLAGS_NE	EQU	FLAGS_NZ
 FLAGS_EQ	EQU	FLAGS_Z
 
 
-	ENDC
+; -- Load 16 bit register with immediate loop count for nested DJ's
+LDLOOP:	MACRO	;reg16,count
+reg__\@	EQUS	"\1".slice(0,1)
+	ld	reg__\@,(\2-1)>>8+1
+	PURGE	reg__\@
+
+reg__\@	EQUS	"\1".slice(1,1)
+	ld	reg__\@,((\2-1)+1)&$FF
+	PURGE	reg__\@
+	ENDM
+
+DELAY:	MACRO	;microseconds
+	push	ft
+	LDLOOP	ft,(\1)**1.68	;adjust for frequency and IPC
+.loop\@	dj	t,.loop\@
+	dj	f,.loop\@	
+	pop	ft
+	ENDM
