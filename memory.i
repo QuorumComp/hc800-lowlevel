@@ -6,5 +6,4 @@ MEMORY_I_INCLUDED_ = 1
 	GLOBAL	SetMemoryWords
 	GLOBAL	CopyCode
 
-
 	ENDC
