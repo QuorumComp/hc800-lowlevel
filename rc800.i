@@ -30,9 +30,15 @@ LDLOOP:	MACRO	;reg16,count
 	ENDM
 
 DELAY:	MACRO	;microseconds
-	push	ft
-	LDLOOP	ft,(\1)**1.68	;adjust for frequency and IPC
-.loop\@	dj	t,.loop\@
-	dj	f,.loop\@	
-	pop	ft
+loopCount\@ = (\1)**1.68
+	IF	loopCount\@>$10000
+		ERROR	"Loop count too large ({loopCount\@})"
+	ELSE
+		push	ft
+		LDLOOP	ft,(\1)**1.68	;adjust for frequency and IPC
+.loop\@		dj	t,.loop\@
+		dj	f,.loop\@	
+		pop	ft
+	ENDC
+	PURGE	loopCount\@
 	ENDM
