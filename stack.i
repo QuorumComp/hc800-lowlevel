@@ -34,7 +34,7 @@ MStackAlloc:	MACRO	;size
 		add	bc,1
 		exg	f,t
 		ld	(bc),t
-		pop	ft
+		pop	ft/bc
 		ENDM
 
 ; ---------------------------------------------------------------------------
