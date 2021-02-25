@@ -6,87 +6,85 @@
 ; -- Multiply two integers
 ; --
 ; -- Inputs:
-; --   de - pointer to multiplicand and result
+; --   bc - pointer to multiplicand and result
 ; --   ft - multiplier
 		SECTION	"MathMultiplyUnsigned_32_16",CODE
 MathMultiplyUnsigned_32_16:
 		pusha
 
-		ld	b,IO_MATH_BASE
+		ld	d,IO_MATH_BASE
 
 		; load multiplier into X
 
-		ld	c,IO_MATH_X
+		ld	e,IO_MATH_X
 		exg	f,t
-		lio	(bc),t
+		lio	(de),t
 		exg	f,t
-		lio	(bc),t
+		lio	(de),t
 
 		; load lo word of multiplicand into Y
 
-		ld	c,IO_MATH_Y
-		add	de,1
-		ld	t,(de)
-		lio	(bc),t
-		sub	de,1
-		ld	t,(de)
-		lio	(bc),t
-		add	de,3
+		ld	e,IO_MATH_Y
+		add	bc,1
+		ld	t,(bc)
+		lio	(de),t
+		sub	bc,1
+		ld	t,(bc)
+		lio	(de),t
+		add	bc,3
 
 		; multiply
 
-		ld	c,IO_MATH_OPERATION
+		ld	e,IO_MATH_OPERATION
 		ld	t,MATH_OP_UNSIGNED_MUL
-		lio	(bc),t
+		lio	(de),t
 
 		; load result into operand
 
-		ld	c,IO_MATH_Z
+		ld	e,IO_MATH_Z
 		ld	hl,operand
 		REPT	3
-		lio	t,(bc)
+		lio	t,(de)
 		ld	(hl),t
 		add	hl,1
 		ENDR
-		lio	t,(bc)
+		lio	t,(de)
 		ld	(hl),t
 
 		; load hi word of multiplicand
 
-		ld	c,IO_MATH_Y
-		ld	t,(de)
-		lio	(bc),t
-		sub	de,1
-		ld	t,(de)
-		lio	(bc),t
-		sub	de,2
+		ld	e,IO_MATH_Y
+		ld	t,(bc)
+		lio	(de),t
+		sub	bc,1
+		ld	t,(bc)
+		lio	(de),t
+		sub	bc,2
 
 		; multiply
 
-		ld	c,IO_MATH_OPERATION
+		ld	e,IO_MATH_OPERATION
 		ld	t,MATH_OP_UNSIGNED_MUL
-		lio	(bc),t
+		lio	(de),t
 
 		; load result into pointer
 
-		ld	c,IO_MATH_Z
+		ld	e,IO_MATH_Z
 
 		ld	t,0
-		ld	(de),t
-		add	de,1
-		ld	(de),t
-		add	de,1
+		ld	(bc),t
+		add	bc,1
+		ld	(bc),t
+		add	bc,1
 
-		lio	t,(bc)
-		ld	(de),t
-		add	de,1
-		lio	t,(bc)
-		ld	(de),t
-		sub	de,3
+		lio	t,(de)
+		ld	(bc),t
+		add	bc,1
+		lio	t,(de)
+		ld	(bc),t
+		sub	bc,3
 
 		; add results
-		ld	ft,de
-		ld	bc,ft
 		jal	MathAdd_32_Operand
 
 		popa
@@ -98,96 +96,96 @@ MathMultiplyUnsigned_32_16:
 ; --
 ; -- Inputs:
 ; --   ft - integer #1
-; --   de - integer #2
+; --   bc - integer #2
 ; --
 ; -- Outputs:
-; --   de:ft - 32 bit result
+; --   bc:ft - 32 bit result
 ; --
 		SECTION	"MathMultiplySigned_16_16",CODE
 MathMultiplySigned_16_16:
-		push	bc
+		push	de
 
-		ld	b,IO_MATH_BASE
-		ld	c,IO_MATH_X
+		ld	d,IO_MATH_BASE
+		ld	e,IO_MATH_X
 
 		exg	f,t
-		lio	(bc),t
+		lio	(de),t
 		exg	f,t
-		lio	(bc),t
+		lio	(de),t
 
-		add	c,1
+		ld	e,IO_MATH_Y
 
-		ld	t,d
-		lio	(bc),t
-		ld	t,e
-		lio	(bc),t
+		ld	t,b
+		lio	(de),t
+		ld	t,c
+		lio	(de),t
 
-		ld	c,IO_MATH_OPERATION
+		ld	e,IO_MATH_OPERATION
 		ld	t,MATH_OP_SIGNED_MUL
-		lio	(bc),t
+		lio	(de),t
 
 		nop
-		ld	c,IO_MATH_Z
+		ld	e,IO_MATH_Z
 
-		lio	t,(bc)
-		ld	e,t
-		lio	t,(bc)
-		ld	d,t
+		lio	t,(de)
+		ld	c,t
+		lio	t,(de)
+		ld	b,t
 
-		lio	t,(bc)
+		lio	t,(de)
 		exg	f,t
-		lio	t,(bc)
+		lio	t,(de)
 		exg	f,t
 
-		pop	bc
+		pop	de
 		j	(hl)
 
 
 DIVIDE:		MACRO
-		push	bc
+		push	de
 
-		ld	b,IO_MATH_BASE
-		ld	c,IO_MATH_Y
+		ld	d,IO_MATH_BASE
+		ld	e,IO_MATH_Y
 
 		exg	f,t
-		lio	(bc),t
+		lio	(de),t
 		exg	f,t
-		lio	(bc),t
+		lio	(de),t
 
-		add	c,1
+		ld	e,IO_MATH_Z
 
-		ld	t,d
-		lio	(bc),t
-		ld	t,e
-		lio	(bc),t
-
-		pop	de
-
-		ld	t,d
-		lio	(bc),t
-		ld	t,e
-		lio	(bc),t
-
-		ld	c,IO_MATH_OPERATION
-		ld	t,\1
-		lio	(bc),t
-
-		nop
-		ld	c,IO_MATH_Y
-
-		lio	t,(bc)
-		ld	e,t
-		lio	t,(bc)
-		ld	d,t
-
-		sub	c,1
-
-		lio	t,(bc)
-		exg	f,t
-		lio	t,(bc)
-		exg	f,t
+		ld	t,b
+		lio	(de),t
+		ld	t,c
+		lio	(de),t
 
 		pop	bc
+
+		ld	t,b
+		lio	(de),t
+		ld	t,c
+		lio	(de),t
+
+		ld	e,IO_MATH_OPERATION
+		ld	t,\1
+		lio	(de),t
+
+		nop
+		ld	e,IO_MATH_Y
+
+		lio	t,(de)
+		ld	c,t
+		lio	t,(de)
+		ld	b,t
+
+		ld	e,IO_MATH_X
+
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+
+		pop	de
 		j	(hl)
 		ENDM
 
@@ -197,11 +195,11 @@ DIVIDE:		MACRO
 ; --
 ; -- Inputs:
 ; --   ft   - divisor
-; --   de*2 - dividend (2*16 bit, high word on top)
+; --   bc*2 - dividend (2*16 bit, high word on top)
 ; --
 ; -- Outputs:
 ; --   ft - quotient
-; --   de - remainder
+; --   bc - remainder
 ; --
 		SECTION	"MathDivideUnsigned_32_16",CODE
 MathDivideUnsigned_32_16:
@@ -213,11 +211,11 @@ MathDivideUnsigned_32_16:
 ; --
 ; -- Inputs:
 ; --   ft   - divisor
-; --   de*2 - dividend (2*16 bit, high word on top)
+; --   bc*2 - dividend (2*16 bit, high word on top)
 ; --
 ; -- Outputs:
 ; --   ft - quotient
-; --   de - remainder
+; --   bc - remainder
 ; --
 		SECTION	"MathDivideSigned_32_16",CODE
 MathDivideSigned_32_16:
