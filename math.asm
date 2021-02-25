@@ -1,5 +1,97 @@
 		INCLUDE	"hc800.i"
 		INCLUDE	"math.i"
+		INCLUDE	"rc800.i"
+
+; ---------------------------------------------------------------------------
+; -- Multiply two integers
+; --
+; -- Inputs:
+; --   de - pointer to multiplicand and result
+; --   ft - multiplier
+		SECTION	"MathMultiplyUnsigned_32_16",CODE
+MathMultiplyUnsigned_32_16:
+		pusha
+
+		ld	b,IO_MATH_BASE
+
+		; load multiplier into X
+
+		ld	c,IO_MATH_X
+		exg	f,t
+		lio	(bc),t
+		exg	f,t
+		lio	(bc),t
+
+		; load lo word of multiplicand into Y
+
+		ld	c,IO_MATH_Y
+		add	de,1
+		ld	t,(de)
+		lio	(bc),t
+		sub	de,1
+		ld	t,(de)
+		lio	(bc),t
+		add	de,3
+
+		; multiply
+
+		ld	c,IO_MATH_OPERATION
+		ld	t,MATH_OP_UNSIGNED_MUL
+		lio	(bc),t
+
+		; load result into operand
+
+		ld	c,IO_MATH_Z
+		ld	hl,operand
+		REPT	3
+		lio	t,(bc)
+		ld	(hl),t
+		add	hl,1
+		ENDR
+		lio	t,(bc)
+		ld	(hl),t
+
+		; load hi word of multiplicand
+
+		ld	c,IO_MATH_Y
+		ld	t,(de)
+		lio	(bc),t
+		sub	de,1
+		ld	t,(de)
+		lio	(bc),t
+		sub	de,2
+
+		; multiply
+
+		ld	c,IO_MATH_OPERATION
+		ld	t,MATH_OP_UNSIGNED_MUL
+		lio	(bc),t
+
+		; load result into pointer
+
+		ld	c,IO_MATH_Z
+
+		ld	t,0
+		ld	(de),t
+		add	de,1
+		ld	(de),t
+		add	de,1
+
+		lio	t,(bc)
+		ld	(de),t
+		add	de,1
+		lio	t,(bc)
+		ld	(de),t
+		sub	de,3
+
+		; add results
+		ld	ft,de
+		ld	bc,ft
+		jal	MathAdd_32_Operand
+
+		popa
+		j	(hl)
+
 
 ; ---------------------------------------------------------------------------
 ; -- Multiply two integers
@@ -11,8 +103,8 @@
 ; -- Outputs:
 ; --   de:ft - 32 bit result
 ; --
-		SECTION	"MathMultiplySigned",CODE
-MathMultiplySigned:
+		SECTION	"MathMultiplySigned_16_16",CODE
+MathMultiplySigned_16_16:
 		push	bc
 
 		ld	b,IO_MATH_BASE
@@ -111,8 +203,8 @@ DIVIDE:		MACRO
 ; --   ft - quotient
 ; --   de - remainder
 ; --
-		SECTION	"MathDivideUnsigned",CODE
-MathDivideUnsigned:
+		SECTION	"MathDivideUnsigned_32_16",CODE
+MathDivideUnsigned_32_16:
 		DIVIDE	MATH_OP_UNSIGNED_DIV
 
 
@@ -127,13 +219,13 @@ MathDivideUnsigned:
 ; --   ft - quotient
 ; --   de - remainder
 ; --
-		SECTION	"MathDivideSigned",CODE
-MathDivideSigned:
+		SECTION	"MathDivideSigned_32_16",CODE
+MathDivideSigned_32_16:
 		DIVIDE	MATH_OP_SIGNED_DIV
 
 
 ; ---------------------------------------------------------------------------
-; -- Add temp to 32 bit integer
+; -- Add operand to 32 bit integer
 ; --
 ; -- Inputs:
 ; --   bc - pointer to integer #1, and result
@@ -142,7 +234,7 @@ MathDivideSigned:
 MathAdd_32_Operand:
 		pusha
 
-		ld	de,temp
+		ld	de,operand
 		jal	MathAdd_32_32
 
 		popa
@@ -182,7 +274,7 @@ MathAdd_32_32:
 
 
 ; ---------------------------------------------------------------------------
-; -- Load 16 bit unsigned integer into temp storage
+; -- Load 16 bit unsigned integer into operand storage
 ; --
 ; -- Inputs:
 ; --   ft - integer
@@ -191,7 +283,7 @@ MathAdd_32_32:
 MathLoadOperand16U:
 		pusha
 
-		ld	bc,temp
+		ld	bc,operand
 		ld	(bc),t
 		add	bc,1
 		exg	f,t
@@ -260,5 +352,36 @@ MathShift_32:
 		j	(hl)
 
 
+; ---------------------------------------------------------------------------
+; -- Log2 of FT (find first one)
+; --
+; -- Inputs:
+; --   ft - integer
+; --
+; -- Outputs:
+; --    t - log2 of FT (0 to 15)
+; --    f - "ne" condition if BC == 0
+MathLog2_16:
+		push	bc/de
+
+		ld	bc,ft
+
+		ld	d,15
+.loop		ld	t,b
+		and	t,$80
+		cmp	t,$80
+		j/eq	.done
+		ld	ft,bc
+		ld	ft,1
+		ld	bc,ft
+		dj	d,.loop
+
+		ld	f,FLAGS_NE
+
+.done		ld	t,d
+		pop	bc/de
+		j	(hl)
+
 		SECTION	"MathVars",BSS
-temp:		DS	4
+operand:	DS	4
+operand2:	DS	4
