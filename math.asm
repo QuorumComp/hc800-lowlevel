@@ -370,7 +370,7 @@ MathLog2_16:
 		cmp	t,$80
 		j/eq	.done
 		ld	ft,bc
-		ld	ft,1
+		ls	ft,1
 		ld	bc,ft
 		dj	d,.loop
 
