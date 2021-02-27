@@ -15,6 +15,7 @@ MInt32:	MACRO	;integer
 	GLOBAL	MathMultiplyUnsigned_32_16
 
 	GLOBAL	MathLoadOperand16U
+	GLOBAL	MathLoadOperand16S
 	GLOBAL	MathAdd_32_32
 	GLOBAL	MathAdd_32_Operand
 

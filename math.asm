@@ -297,6 +297,32 @@ MathLoadOperand16U:
 
 
 ; ---------------------------------------------------------------------------
+; -- Load 16 bit signed integer into operand storage
+; --
+; -- Inputs:
+; --   ft - integer
+; --
+		SECTION	"MathLoadOperand16S",CODE
+MathLoadOperand16S:
+		pusha
+
+		ld	bc,operand
+		ld	(bc),t
+		add	bc,1
+		exg	f,t
+		ld	(bc),t
+		add	bc,1
+		ext
+		exg	f,t
+		ld	(bc),t
+		add	bc,1
+		ld	(bc),t
+
+		popa
+		j	(hl)
+
+
+; ---------------------------------------------------------------------------
 ; -- Shift 32 integer to the left
 ; --
 ; -- Inputs:
