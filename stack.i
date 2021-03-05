@@ -7,11 +7,17 @@ LOWLEVEL_STACK_I_INCLUDED__ = 1
 ; -- Allocate and initialize a stack
 ; --
 MStackInit:	MACRO	;size
+		pusha
+		ld	ft,StackArea
+		ld	bc,StackPointer
+		ld	(ft),c
+		add	ft,1
+		ld	(ft),b
+		popa
 		PUSHS
 		SECTION	"StackArea",BSS_S
 StackArea:	DS	\1
-		SECTION	"Pointer",DATA
-StackPointer:	DW	StackArea
+StackPointer::	DS	2
 		POPS
 		ENDM
 

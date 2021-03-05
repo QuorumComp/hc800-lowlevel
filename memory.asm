@@ -41,7 +41,7 @@ SetMemoryWords:
 ; --
 ; -- Input:
 ; --   bc - destination
-; --   de - bytes to set
+; --   de - number of bytes to set
 ; --    t - value
 ; --
 		SECTION	"SetMemory",CODE
