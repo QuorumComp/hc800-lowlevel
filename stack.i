@@ -29,18 +29,17 @@ StackPointer::	DS	2
 ; --
 MStackAlloc:	MACRO	;size
 		push	bc
-		ld	bc,StackPointer+1
-		ld	t,(bc)
-		exg	f,t
-		sub	bc,1
-		ld	t,(bc)
-		push	ft
-		add	ft,\1
-		ld	(bc),t
-		add	bc,1
-		exg	f,t
-		ld	(bc),t
-		pop	ft/bc
+		ld	ft,StackPointer
+		ld	c,(ft)
+		add	ft,1
+		ld	b,(ft)
+		push	bc
+		add	bc,\1
+		ld	(ft),b
+		sub	ft,1
+		ld	(ft),c
+		ld	ft,bc
+		pop	bc
 		ENDM
 
 ; ---------------------------------------------------------------------------
