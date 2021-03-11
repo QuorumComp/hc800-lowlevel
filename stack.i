@@ -33,7 +33,6 @@ MStackAlloc:	MACRO	;size
 		ld	c,(ft)
 		add	ft,1
 		ld	b,(ft)
-		push	bc
 		add	bc,\1
 		ld	(ft),b
 		sub	ft,1
