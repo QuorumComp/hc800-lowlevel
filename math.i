@@ -9,6 +9,8 @@ MInt32:	MACRO	;integer
 	DB	(\1)>>24&$FF
 	ENDM
 
+	GLOBAL	MathCopy_32
+
 	GLOBAL	MathMultiplySigned_16_16
 	GLOBAL	MathDivideUnsigned_32_16
 	GLOBAL	MathDivideSigned_32_16
@@ -19,7 +21,8 @@ MInt32:	MACRO	;integer
 	GLOBAL	MathAdd_32_32
 	GLOBAL	MathAdd_32_Operand
 
-	GLOBAL	MathShift_32
+	GLOBAL	MathShiftLeft_32
+	GLOBAL	MathShiftRight_32
 
 	GLOBAL	MathLog2_16
 

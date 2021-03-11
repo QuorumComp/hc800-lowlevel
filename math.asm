@@ -223,6 +223,27 @@ MathDivideSigned_32_16:
 
 
 ; ---------------------------------------------------------------------------
+; -- Copy 32 bit integer
+; --
+; -- Inputs:
+; --   bc - pointer to result
+; --   de - pointer to source
+; --
+		SECTION	"MathCopy_32",CODE
+MathCopy_32:
+		pusha
+
+		ld	f,4
+.loop		ld	t,(de)
+		ld	(bc),t
+		add	de,1
+		add	bc,1
+		dj	f,.loop
+
+		popa
+		j	(hl)
+
+; ---------------------------------------------------------------------------
 ; -- Add operand to 32 bit integer
 ; --
 ; -- Inputs:
@@ -329,9 +350,9 @@ MathLoadOperand16S:
 ; --    t - shift amount
 ; --   bc - pointer to integer #1, and result
 ; --
-		SECTION	"MathShift_32",CODE
-MathShift_32:
-		push	ft-de
+		SECTION	"MathShiftLeft_32",CODE
+MathShiftLeft_32:
+		pusha
 
 		and	t,31
 		ld	e,t
@@ -372,7 +393,59 @@ MathShift_32:
 		ls	ft,e
 		ld	(bc),t
 
-		pop	ft-de
+		popa
+		j	(hl)
+
+
+; ---------------------------------------------------------------------------
+; -- Shift 32 integer to the right
+; --
+; -- Inputs:
+; --    t - shift amount
+; --   bc - pointer to integer #1, and result
+; --
+		SECTION	"MathShiftRight_32",CODE
+MathShiftRight_32:
+		pusha
+
+		and	t,31
+		ld	e,t
+
+.shift_byte	cmp	e,8
+		j/ltu	.shift_partial
+
+		add	bc,1
+		ld	f,3
+.shift_b_loop	ld	t,(bc)
+		sub	bc,1
+		ld	(bc),t
+		add	bc,2
+		dj	f,.shift_b_loop
+		sub	bc,1
+		ld	t,0
+		ld	(bc),t
+		sub	bc,3
+
+		sub	e,8
+		j	.shift_byte
+
+.shift_partial	ld	d,3
+.shift_p_loop	ld	t,(bc)
+		exg	f,t
+		add	bc,1
+		ld	t,(bc)
+		exg	f,t
+		rs	ft,e
+		sub	bc,1
+		ld	(bc),t
+		add	bc,1
+		dj	d,.shift_p_loop
+
+		ld	t,(bc)
+		rs	ft,e
+		ld	(bc),t
+
+		popa
 		j	(hl)
 
 
