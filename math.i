@@ -11,10 +11,10 @@ MInt32:	MACRO	;integer
 
 	GLOBAL	MathCopy_32
 
-	GLOBAL	MathMultiplySigned_16_16
+	GLOBAL	MathMultiplySigned_16x16_p32
+	GLOBAL	MathMultiplyUnsigned_32x16_p32
 	GLOBAL	MathDivideUnsigned_32_16
-	GLOBAL	MathDivideSigned_32_16
-	GLOBAL	MathMultiplyUnsigned_32_16
+	GLOBAL	MathDivideSigned_32by16_q16_r16
 
 	GLOBAL	MathLoadOperand16U
 	GLOBAL	MathLoadOperand16S

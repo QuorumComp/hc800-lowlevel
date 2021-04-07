@@ -8,8 +8,9 @@
 ; -- Inputs:
 ; --   bc - pointer to multiplicand and result
 ; --   ft - multiplier
-		SECTION	"MathMultiplyUnsigned_32_16",CODE
-MathMultiplyUnsigned_32_16:
+; --
+		SECTION	"MathMultiplyUnsigned_32x16_p32",CODE
+MathMultiplyUnsigned_32x16_p32:
 		pusha
 
 		ld	d,IO_MATH_BASE
@@ -101,8 +102,8 @@ MathMultiplyUnsigned_32_16:
 ; -- Outputs:
 ; --   bc:ft - 32 bit result
 ; --
-		SECTION	"MathMultiplySigned_16_16",CODE
-MathMultiplySigned_16_16:
+		SECTION	"MathMultiplySigned_16x16_p32",CODE
+MathMultiplySigned_16x16_p32:
 		push	de
 
 		ld	d,IO_MATH_BASE
@@ -217,8 +218,8 @@ MathDivideUnsigned_32_16:
 ; --   ft - quotient
 ; --   bc - remainder
 ; --
-		SECTION	"MathDivideSigned_32_16",CODE
-MathDivideSigned_32_16:
+		SECTION	"MathDivideSigned_32by16_q16_r16",CODE
+MathDivideSigned_32by16_q16_r16:
 		DIVIDE	MATH_OP_SIGNED_DIV
 
 
