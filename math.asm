@@ -493,21 +493,20 @@ MathLoadLong:
 
 		push	ft
 
-		ld	t,(bc)
 		add	bc,1
+		ld	t,(bc)
+		sub	bc,1
 		exg	f,t
 		ld	t,(bc)
-		add	bc,1
-		exg	f,t
+		add	bc,3
 
 		push	ft
-		ld	t,(bc)
-		add	bc,1
-		exg	f,t
-		ld	t,(bc)
-		exg	f,t
 
-		swap	ft
+		ld	t,(bc)
+		sub	bc,1
+		exg	f,t
+		ld	t,(bc)
+
 		pop	bc/de
 		j	(hl)
 
@@ -553,8 +552,6 @@ MathCompareLong:
 		cmp	ft,bc
 		j/eq	.lo
 
-		swap	ft
-		pop	ft
 		swap	ft
 		pop	ft
 		j	(hl)
