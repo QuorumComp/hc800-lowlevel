@@ -26,4 +26,9 @@ MInt32:	MACRO	;integer
 
 	GLOBAL	MathLog2_16
 
+	GLOBAL	MathLoadLong
+
+	GLOBAL	MathDupLong
+	GLOBAL	MathCompareLong
+
 	ENDC
