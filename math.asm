@@ -402,52 +402,47 @@ MathShiftLeft_32:
 ; -- Shift 32 integer to the right
 ; --
 ; -- Inputs:
-; --    t - shift amount
-; --   bc - pointer to integer #1, and result
+; --   ft:ft' - integer
+; --        b - shift amount
 ; --
+; -- Outputs:
+; --   ft:ft' - integer
 		SECTION	"MathShiftRight_32",CODE
 MathShiftRight_32:
-		pusha
+		push	ft-de
 
-		and	t,31
-		ld	e,t
+		cmp	b,16	; shift more than 16 positions?
+		j/geu	.simple
 
-.shift_byte	cmp	e,8
-		j/ltu	.shift_partial
+		ld	t,16
+		sub	t,b
+		ld	c,t	; c = amount to left shift to get the part that is shifted into other word
 
-		add	bc,1
-		ld	f,3
-.shift_b_loop	ld	t,(bc)
-		sub	bc,1
-		ld	(bc),t
-		add	bc,2
-		dj	f,.shift_b_loop
-		sub	bc,1
-		ld	t,0
-		ld	(bc),t
-		sub	bc,3
+		pop	ft
+		ld	de,ft
+		ls	ft,c
+		exg	de,ft	; de = part that spills into lower word
+		rs	ft,b
 
-		sub	e,8
-		j	.shift_byte
-
-.shift_partial	ld	d,3
-.shift_p_loop	ld	t,(bc)
+		swap	ft
+		rs	ft,b
+		or	t,e
 		exg	f,t
-		add	bc,1
-		ld	t,(bc)
+		or	t,d
 		exg	f,t
-		rs	ft,e
-		sub	bc,1
-		ld	(bc),t
-		add	bc,1
-		dj	d,.shift_p_loop
 
-		ld	t,(bc)
-		rs	ft,e
-		ld	(bc),t
-
-		popa
+		swap	ft
+		pop	bc/de
 		j	(hl)
+
+
+.simple		pop	ft
+		rs	ft,b
+		swap	ft
+		ld	ft,0
+
+		pop	bc/de
+		j	(hl)		
 
 
 ; ---------------------------------------------------------------------------
@@ -458,7 +453,9 @@ MathShiftRight_32:
 ; --
 ; -- Outputs:
 ; --    t - log2 of FT (0 to 15)
-; --    f - "ne" condition if BC == 0
+; --    f - "ne" condition if FT == 0
+; --
+		SECTION	"MathLog2_16",CODE
 MathLog2_16:
 		push	bc/de
 
@@ -479,6 +476,97 @@ MathLog2_16:
 .done		ld	t,d
 		pop	bc/de
 		j	(hl)
+
+
+; --
+; -- Push little endian 32 bit value unto FT stack
+; --
+; -- Inputs:
+; --   bc - pointer to value
+; --
+; -- Outputs:
+; --   ft:ft' - value
+; --
+		SECTION	"MathLoadLong",CODE
+MathLoadLong:
+		push	bc/de
+
+		push	ft
+
+		ld	t,(bc)
+		add	bc,1
+		exg	f,t
+		ld	t,(bc)
+		add	bc,1
+		exg	f,t
+
+		push	ft
+		ld	t,(bc)
+		add	bc,1
+		exg	f,t
+		ld	t,(bc)
+		exg	f,t
+
+		swap	ft
+		pop	bc/de
+		j	(hl)
+
+
+; --
+; -- Duplicate (or "push") the top 32 bit value in FT:FT'
+; --
+; -- Inputs:
+; --   ft:ft' - value to duplicate
+; --
+; -- Outputs:
+; --   ft:ft':ft'':ft''' - value
+; --
+		SECTION	"MathDupLong",CODE
+MathDupLong:
+		push	bc
+
+		swap	ft	;h,l
+		ld	bc,ft
+		swap	ft	;l,h
+		push	ft	;l,l,h
+		push	ft	;l,l,l,h
+		ld	ft,bc	;h,l,l,h
+		swap	ft	;l,h,l,h
+
+		pop	bc
+		j	(hl)
+
+
+; --
+; -- Compare 32 bit values
+; --
+; -- Inputs:
+; --   ft:ft' - comparand
+; --   bc:bc' - comparer
+; --
+; -- Outputs:
+; --   ft:ft' consumed
+; --   f - result
+; --
+		SECTION	"MathCompareLong",CODE
+MathCompareLong:
+		cmp	ft,bc
+		j/eq	.lo
+
+		swap	ft
+		pop	ft
+		swap	ft
+		pop	ft
+		j	(hl)
+
+.lo		swap	bc
+		pop	ft
+		cmp	ft,bc
+		swap	bc
+		swap	ft
+		pop	ft
+		j	(hl)
+
 
 		SECTION	"MathVars",BSS
 operand:	DS	4
