@@ -6,16 +6,22 @@
 ; -- Multiply two integers
 ; --
 ; -- Inputs:
-; --   bc - pointer to multiplicand and result
-; --   ft - multiplier
+; --   ft:ft' - multiplicand
+; --       bc - multiplier
+; --
+; -- Outputs:
+; --   multiplicand consumed/replaced
+; --   ft:ft' - result
 ; --
 		SECTION	"MathMultiplyUnsigned_32x16_p32",CODE
 MathMultiplyUnsigned_32x16_p32:
-		pusha
+		push	bc-hl
 
 		ld	d,IO_MATH_BASE
 
-		; load multiplier into X
+		; load low word of multiplicand into X
+
+		swap	ft
 
 		ld	e,IO_MATH_X
 		exg	f,t
@@ -23,16 +29,13 @@ MathMultiplyUnsigned_32x16_p32:
 		exg	f,t
 		lio	(de),t
 
-		; load lo word of multiplicand into Y
+		; load multiplier into Y
 
 		ld	e,IO_MATH_Y
-		add	bc,1
-		ld	t,(bc)
+		ld	t,b
 		lio	(de),t
-		sub	bc,1
-		ld	t,(bc)
+		ld	t,c
 		lio	(de),t
-		add	bc,3
 
 		; multiply
 
@@ -40,27 +43,31 @@ MathMultiplyUnsigned_32x16_p32:
 		ld	t,MATH_OP_UNSIGNED_MUL
 		lio	(de),t
 
-		; load result into operand
+		; load result into bc:bc'
 
 		ld	e,IO_MATH_Z
-		ld	hl,operand
-		REPT	3
+
 		lio	t,(de)
-		ld	(hl),t
-		add	hl,1
-		ENDR
+		exg	f,t
+		lio	t,(ft)
+		exg	f,t
+		ld	bc,ft
+		push	bc
+
 		lio	t,(de)
-		ld	(hl),t
+		exg	f,t
+		lio	t,(ft)
+		exg	f,t
+		ld	bc,ft
 
 		; load hi word of multiplicand
 
 		ld	e,IO_MATH_Y
-		ld	t,(bc)
+		pop	ft
+		exg	f,t
 		lio	(de),t
-		sub	bc,1
-		ld	t,(bc)
+		exg	f,t
 		lio	(de),t
-		sub	bc,2
 
 		; multiply
 
@@ -72,23 +79,21 @@ MathMultiplyUnsigned_32x16_p32:
 
 		ld	e,IO_MATH_Z
 
-		ld	t,0
-		ld	(bc),t
-		add	bc,1
-		ld	(bc),t
-		add	bc,1
-
 		lio	t,(de)
-		ld	(bc),t
-		add	bc,1
+		exg	f,t
 		lio	t,(de)
-		ld	(bc),t
-		sub	bc,3
+		exg	f,t
+		push	ft
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
 
 		; add results
-		jal	MathAdd_32_Operand
+		jal	MathAdd_32_32
+		pop	bc	; discard operand
 
-		popa
+		pop	bc-hl
 		j	(hl)
 
 
@@ -100,247 +105,154 @@ MathMultiplyUnsigned_32x16_p32:
 ; --   bc - integer #2
 ; --
 ; -- Outputs:
-; --   bc:ft - 32 bit result
+; --   ft:ft' - 32 bit result (one word pushed)
 ; --
 		SECTION	"MathMultiplySigned_16x16_p32",CODE
 MathMultiplySigned_16x16_p32:
-		push	de
-
-		ld	d,IO_MATH_BASE
-		ld	e,IO_MATH_X
-
-		exg	f,t
-		lio	(de),t
-		exg	f,t
-		lio	(de),t
-
-		ld	e,IO_MATH_Y
-
-		ld	t,b
-		lio	(de),t
-		ld	t,c
-		lio	(de),t
-
-		ld	e,IO_MATH_OPERATION
-		ld	t,MATH_OP_SIGNED_MUL
-		lio	(de),t
-
-		nop
-		ld	e,IO_MATH_Z
-
-		lio	t,(de)
-		ld	c,t
-		lio	t,(de)
-		ld	b,t
-
-		lio	t,(de)
-		exg	f,t
-		lio	t,(de)
-		exg	f,t
-
-		pop	de
+		push	bc/hl
+		ld	c,MATH_OP_SIGNED_MUL
+		swap	bc
+		jal	multiply
+		pop	hl
 		j	(hl)
 
 
-DIVIDE:		MACRO
-		push	de
-
-		ld	d,IO_MATH_BASE
-		ld	e,IO_MATH_Y
-
-		exg	f,t
-		lio	(de),t
-		exg	f,t
-		lio	(de),t
-
-		ld	e,IO_MATH_Z
-
-		ld	t,b
-		lio	(de),t
-		ld	t,c
-		lio	(de),t
-
-		pop	bc
-
-		ld	t,b
-		lio	(de),t
-		ld	t,c
-		lio	(de),t
-
-		ld	e,IO_MATH_OPERATION
-		ld	t,\1
-		lio	(de),t
-
-		nop
-		ld	e,IO_MATH_Y
-
-		lio	t,(de)
-		ld	c,t
-		lio	t,(de)
-		ld	b,t
-
-		ld	e,IO_MATH_X
-
-		lio	t,(de)
-		exg	f,t
-		lio	t,(de)
-		exg	f,t
-
-		pop	de
+; ---------------------------------------------------------------------------
+; -- Multiply two integers
+; --
+; -- Inputs:
+; --   ft - integer #1
+; --   bc - integer #2
+; --
+; -- Outputs:
+; --   ft:ft' - 32 bit result (one word pushed)
+; --
+		SECTION	"MathMultiplyUnsigned_16x16_p32",CODE
+MathMultiplyUnsigned_16x16_p32:
+		push	bc/hl
+		ld	c,MATH_OP_UNSIGNED_MUL
+		swap	bc
+		jal	multiply
+		pop	hl
 		j	(hl)
-		ENDM
 
 
 ; ---------------------------------------------------------------------------
 ; -- Divide two integers
 ; --
 ; -- Inputs:
-; --   ft   - divisor
-; --   bc*2 - dividend (2*16 bit, high word on top)
+; --   ft:ft' - dividend
+; --   bc     - divisor
 ; --
 ; -- Outputs:
-; --   ft - quotient
-; --   bc - remainder
+; --   ft  - remainder
+; --   ft' - quotient
 ; --
-		SECTION	"MathDivideUnsigned_32_16",CODE
-MathDivideUnsigned_32_16:
-		DIVIDE	MATH_OP_UNSIGNED_DIV
+		SECTION	"MathDivideUnsigned_32by16_q16_r16",CODE
+MathDivideUnsigned_32by16_q16_r16:
+		push	hl/bc
+		ld	c,MATH_OP_UNSIGNED_DIV
+		swap	bc
+		jal	divide
+		pop	hl
+		j	(hl)
 
 
 ; ---------------------------------------------------------------------------
 ; -- Divide two integers
 ; --
 ; -- Inputs:
-; --   ft   - divisor
-; --   bc*2 - dividend (2*16 bit, high word on top)
+; --   ft:ft' - dividend
+; --   bc     - divisor
 ; --
 ; -- Outputs:
-; --   ft - quotient
-; --   bc - remainder
+; --   ft  - remainder
+; --   ft' - quotient
 ; --
 		SECTION	"MathDivideSigned_32by16_q16_r16",CODE
 MathDivideSigned_32by16_q16_r16:
-		DIVIDE	MATH_OP_SIGNED_DIV
-
-
-; ---------------------------------------------------------------------------
-; -- Copy 32 bit integer
-; --
-; -- Inputs:
-; --   bc - pointer to result
-; --   de - pointer to source
-; --
-		SECTION	"MathCopy_32",CODE
-MathCopy_32:
-		pusha
-
-		ld	f,4
-.loop		ld	t,(de)
-		ld	(bc),t
-		add	de,1
-		add	bc,1
-		dj	f,.loop
-
-		popa
+		push	hl/bc
+		ld	c,MATH_OP_SIGNED_DIV
+		swap	bc
+		jal	divide
+		pop	hl
 		j	(hl)
 
-; ---------------------------------------------------------------------------
-; -- Add operand to 32 bit integer
-; --
-; -- Inputs:
-; --   bc - pointer to integer #1, and result
-; --
-		SECTION	"MathAdd_32_Operand",CODE
-MathAdd_32_Operand:
-		pusha
-
-		ld	de,operand
-		jal	MathAdd_32_32
-
-		popa
-		j	(hl)
 
 ; ---------------------------------------------------------------------------
 ; -- Add two 32 bit integers
 ; --
 ; -- Inputs:
-; --   bc - pointer to integer #1, and result
-; --   de - pointer to integer #2
+; --   ft:ft' - integer #1
+; --   bc:bc' - integer #2
+; --
+; -- Outputs:
+; --   integer #1 consumed/replaced
+; --   ft:ft' - integer
 ; --
 		SECTION	"MathAdd_32_32",CODE
 MathAdd_32_32:
-		pusha
+		push	de-hl
 
+		ld	l,2
+		ld	d,0
+.expand		exg	f,t
+
+		ld	e,t
+		push	de
+
+		ld	t,b
+		ld	e,t
+		push	de
+
+		exg	f,t
+		ld	e,t
+		push	de
+
+		ld	t,c
+		ld	e,t
+		push	de
+		
+		pop	ft
+		swap	bc
+
+		dj	l,.expand
+
+		push	ft	; save user's content
+
+		; de stack contains four zero extended bytes pairs, low pair on top
 		ld	l,4
-		ld	f,0
-.loop		push	hl
+		ld	ft,0
+.add_bytes	pop	de
+		add	ft,de
+		pop	de
+		add	ft,de
+		push	ft
+		rs	ft,8	; carry for next add
+		dj	l,.add_bytes
 
-		ld	t,(bc)
-		ld	l,t
-		ld	h,0
-		add/c	hl,1
-		ld	t,(de)
-		ld	f,0
-		add	ft,hl
-		ld	(bc),t
-		add	bc,1
-		add	de,1
+		; ft stack contains four words where f should be ignored and t is a byte of the result
+		; high byte on top
 
-		pop	hl
-		dj	l,.loop
+		pop	ft
+		ld	d,t
+		pop	ft
+		ld	e,t
+		push	de	; high word of result in DE
 
-		popa
-		j	(hl)
+		pop	ft
+		ld	d,t
+		pop	ft
+		ld	e,t
+		ld	ft,de
+		push	ft	; low word of result
 
+		pop	de
+		ld	ft,de	; high word of result in FT
 
-; ---------------------------------------------------------------------------
-; -- Load 16 bit unsigned integer into operand storage
-; --
-; -- Inputs:
-; --   ft - integer
-; --
-		SECTION	"MathLoadOperand16U",CODE
-MathLoadOperand16U:
-		pusha
+		; ft:ft' = result
 
-		ld	bc,operand
-		ld	(bc),t
-		add	bc,1
-		exg	f,t
-		ld	(bc),t
-		add	bc,1
-		ld	t,0
-		ld	(bc),t
-		add	bc,1
-		ld	(bc),t
-
-		popa
-		j	(hl)
-
-
-; ---------------------------------------------------------------------------
-; -- Load 16 bit signed integer into operand storage
-; --
-; -- Inputs:
-; --   ft - integer
-; --
-		SECTION	"MathLoadOperand16S",CODE
-MathLoadOperand16S:
-		pusha
-
-		ld	bc,operand
-		ld	(bc),t
-		add	bc,1
-		exg	f,t
-		ld	(bc),t
-		add	bc,1
-		ext
-		exg	f,t
-		ld	(bc),t
-		add	bc,1
-		ld	(bc),t
-
-		popa
+		pop	de-hl
 		j	(hl)
 
 
@@ -348,54 +260,49 @@ MathLoadOperand16S:
 ; -- Shift 32 integer to the left
 ; --
 ; -- Inputs:
-; --    t - shift amount
-; --   bc - pointer to integer #1, and result
+; --   ft:ft' - integer
+; --        b - shift amount
+; --
+; -- Outputs:
+; --   ft:ft' - integer
 ; --
 		SECTION	"MathShiftLeft_32",CODE
 MathShiftLeft_32:
-		pusha
+		push	ft-de
 
-		and	t,31
-		ld	e,t
+		cmp	b,16	; shift more than 16 positions?
+		j/geu	.simple
 
-		add	bc,3
+		ld	t,16
+		sub	t,b
+		ld	c,t	; c = amount to right shift to get the part that is shifted into other word
 
-.shift_byte	cmp	e,8
-		j/ltu	.shift_partial
+		pop	ft
 
-		sub	bc,1
-		ld	f,3
-.shift_b_loop	ld	t,(bc)
-		add	bc,1
-		ld	(bc),t
-		sub	bc,2
-		dj	f,.shift_b_loop
-		add	bc,1
-		ld	t,0
-		ld	(bc),t
-		add	bc,3
+		swap	ft
+		ld	de,ft
+		rs	ft,c
+		exg	de,ft	; de = part that spills into high word
+		rs	ft,b
+		swap	ft
 
-		sub	e,8
-		j	.shift_byte
-
-.shift_partial	ld	d,3
-.shift_p_loop	ld	t,(bc)
+		ls	ft,b
+		or	t,e
 		exg	f,t
-		sub	bc,1
-		ld	t,(bc)
-		ls	ft,e
+		or	t,d
 		exg	f,t
-		add	bc,1
-		ld	(bc),t
-		sub	bc,1
-		dj	d,.shift_p_loop
 
-		ld	t,(bc)
-		ls	ft,e
-		ld	(bc),t
-
-		popa
+		pop	bc/de
 		j	(hl)
+
+
+.simple		pop	ft
+		ld	ft,0
+		swap	ft
+		ls	ft,b
+
+		pop	bc/de
+		j	(hl)		
 
 
 ; ---------------------------------------------------------------------------
@@ -479,7 +386,60 @@ MathLog2_16:
 
 
 ; --
-; -- Push little endian 32 bit value unto FT stack
+; -- Store value in FT:FT' as little endian 32 bit value
+; --
+; -- Inputs:
+; --   bc - pointer to value
+; --
+; -- Outputs:
+; --   ft:ft' consumed
+; --
+		SECTION	"MathStoreLong",CODE
+MathStoreLong:
+		add	bc,2
+		ld	(bc),t
+
+		exg	f,t
+		add	bc,1
+		ld	(bc),t
+
+		pop	ft
+
+		sub	bc,3
+		ld	(bc),t
+
+		add	bc,1
+		exg	f,t
+		ld	(bc),t
+
+		sub	bc,1
+		pop	ft
+
+		j	(hl)
+
+
+; --
+; -- Push zero extended little endian 16 bit value onto FT stack
+; --
+; -- Inputs:
+; --   bc - pointer to value
+; --
+; -- Outputs:
+; --   ft:ft' - value
+; --
+		SECTION	"MathLoadUWord",CODE
+MathLoadUWord:
+		push	ft
+		add	bc,1
+		ld	t,(bc)
+		exg	f,t
+		sub	bc,1
+		ld	t,(bc)
+		MZeroExtend ft
+		j	(hl)
+
+; --
+; -- Push little endian 32 bit value onto FT stack
 ; --
 ; -- Inputs:
 ; --   bc - pointer to value
@@ -489,25 +449,7 @@ MathLog2_16:
 ; --
 		SECTION	"MathLoadLong",CODE
 MathLoadLong:
-		push	bc/de
-
-		push	ft
-
-		add	bc,1
-		ld	t,(bc)
-		sub	bc,1
-		exg	f,t
-		ld	t,(bc)
-		add	bc,3
-
-		push	ft
-
-		ld	t,(bc)
-		sub	bc,1
-		exg	f,t
-		ld	t,(bc)
-
-		pop	bc/de
+		MPush32	ft,(bc)
 		j	(hl)
 
 
@@ -518,21 +460,12 @@ MathLoadLong:
 ; --   ft:ft' - value to duplicate
 ; --
 ; -- Outputs:
-; --   ft:ft':ft'':ft''' - value
+; --   ft:ft' - value
+; --   ft'':ft''' - value
 ; --
 		SECTION	"MathDupLong",CODE
 MathDupLong:
-		push	bc
-
-		swap	ft	;h,l
-		ld	bc,ft
-		swap	ft	;l,h
-		push	ft	;l,l,h
-		push	ft	;l,l,l,h
-		ld	ft,bc	;h,l,l,h
-		swap	ft	;l,h,l,h
-
-		pop	bc
+		MPush32	ft
 		j	(hl)
 
 
@@ -559,12 +492,156 @@ MathCompareLong:
 .lo		swap	bc
 		pop	ft
 		cmp	ft,bc
+
+		; adjust flags so signed result is equal to unsigned result
+		; - clear overflow flag
+		; - if carry is set, set negative flag
+		ld	t,f
+		and	t,FLAGS_CARRY|FLAGS_ZERO
+		or/c	t,FLAGS_NEGATIVE
+		ld	f,t
+
 		swap	bc
 		swap	ft
 		pop	ft
 		j	(hl)
 
 
-		SECTION	"MathVars",BSS
-operand:	DS	4
-operand2:	DS	4
+; ---------------------------------------------------------------------------
+; -- PRIVATE FUNCTIONS
+; ---------------------------------------------------------------------------
+
+; ---------------------------------------------------------------------------
+; -- Multiply two integers
+; --
+; -- Inputs:
+; --   ft - integer #1
+; --   bc - integer #2
+; --   bc'    - operation
+; --
+; -- Outputs:
+; --   ft:ft' consumed
+; --   bc' consumed
+; --
+; --   ft:ft' - 32 bit result
+; --
+		SECTION	"MathMultiplyCommon",CODE
+multiply:
+		push	de
+
+		ld	d,IO_MATH_BASE
+
+		; load X with integer #1
+		ld	e,IO_MATH_X
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+
+		; load Y with integer #1
+		ld	e,IO_MATH_Y
+		ld	t,b
+		lio	(de),t
+		ld	t,c
+		lio	(de),t
+
+		; multiply
+		swap	bc
+		ld	t,c
+		pop	bc
+		
+		ld	e,IO_MATH_OPERATION
+		lio	(de),t
+
+		nop
+		ld	e,IO_MATH_Z
+
+		; get low word of result
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+		push	ft
+
+		; get high word of result
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+
+		pop	de
+		j	(hl)
+
+
+; ---------------------------------------------------------------------------
+; -- Divide two integers
+; --
+; -- Inputs:
+; --   ft:ft' - dividend
+; --   bc     - divisor
+; --   bc'    - operation
+; --
+; -- Outputs:
+; --   ft:ft' consumed
+; --   bc' consumed
+; --
+; --   ft  - remainder
+; --   ft' - quotient
+; --   bc  - divisor
+; --
+
+		SECTION	"MathDivideCommon",CODE
+divide:		push	de
+
+		ld	d,IO_MATH_BASE
+
+		; load Z with dividend
+		ld	e,IO_MATH_Z
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+
+		pop	ft
+
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+
+		; load Y with divisor
+		ld	e,IO_MATH_Y
+		ld	t,b
+		lio	(de),t
+		ld	t,c
+		lio	(de),t
+
+		; divide
+		swap	bc
+		ld	e,IO_MATH_OPERATION
+		ld	t,c
+		lio	(de),t
+		pop	bc
+
+		nop
+
+		; get quotient
+
+		ld	e,IO_MATH_X
+
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+		push	ft
+
+		; get remainder
+
+		ld	e,IO_MATH_Y
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+
+		pop	de
+		j	(hl)
