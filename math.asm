@@ -6,11 +6,10 @@
 ; -- Multiply two integers
 ; --
 ; -- Inputs:
-; --   ft:ft' - multiplicand
+; --   ft:ft' - multiplicand (consumed)
 ; --       bc - multiplier
 ; --
 ; -- Outputs:
-; --   multiplicand consumed/replaced
 ; --   ft:ft' - result
 ; --
 		SECTION	"MathMultiplyUnsigned_32x16_p32",CODE
@@ -183,11 +182,10 @@ MathDivideSigned_32by16_q16_r16:
 ; -- Add two 32 bit integers
 ; --
 ; -- Inputs:
-; --   ft:ft' - integer #1
+; --   ft:ft' - integer #1 (consumed)
 ; --   bc:bc' - integer #2
 ; --
 ; -- Outputs:
-; --   integer #1 consumed/replaced
 ; --   ft:ft' - integer
 ; --
 		SECTION	"MathAdd_32_32",CODE
@@ -260,7 +258,7 @@ MathAdd_32_32:
 ; -- Shift 32 integer to the left
 ; --
 ; -- Inputs:
-; --   ft:ft' - integer
+; --   ft:ft' - integer (consumed)
 ; --        b - shift amount
 ; --
 ; -- Outputs:
@@ -309,11 +307,12 @@ MathShiftLeft_32:
 ; -- Shift 32 integer to the right
 ; --
 ; -- Inputs:
-; --   ft:ft' - integer
+; --   ft:ft' - integer (consumed)
 ; --        b - shift amount
 ; --
 ; -- Outputs:
 ; --   ft:ft' - integer
+; --
 		SECTION	"MathShiftRight_32",CODE
 MathShiftRight_32:
 		push	ft-de
@@ -385,7 +384,7 @@ MathLog2_16:
 		j	(hl)
 
 
-; --
+; ---------------------------------------------------------------------------
 ; -- Store value in FT:FT' as little endian 32 bit value
 ; --
 ; -- Inputs:
@@ -418,7 +417,7 @@ MathStoreLong:
 		j	(hl)
 
 
-; --
+; ---------------------------------------------------------------------------
 ; -- Push zero extended little endian 16 bit value onto FT stack
 ; --
 ; -- Inputs:
@@ -438,7 +437,7 @@ MathLoadUWord:
 		MZeroExtend ft
 		j	(hl)
 
-; --
+; ---------------------------------------------------------------------------
 ; -- Push little endian 32 bit value onto FT stack
 ; --
 ; -- Inputs:
@@ -453,7 +452,7 @@ MathLoadLong:
 		j	(hl)
 
 
-; --
+; ---------------------------------------------------------------------------
 ; -- Duplicate (or "push") the top 32 bit value in FT:FT'
 ; --
 ; -- Inputs:
@@ -469,15 +468,14 @@ MathDupLong:
 		j	(hl)
 
 
-; --
+; ---------------------------------------------------------------------------
 ; -- Compare 32 bit values
 ; --
 ; -- Inputs:
-; --   ft:ft' - comparand
+; --   ft:ft' - comparand (consumed)
 ; --   bc:bc' - comparer
 ; --
 ; -- Outputs:
-; --   ft:ft' consumed
 ; --   f - result
 ; --
 		SECTION	"MathCompareLong",CODE

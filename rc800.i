@@ -52,7 +52,10 @@ loopCount\@ = (\1)**1.68 ;adjust for frequency and IPC
 	PURGE	loopCount\@
 	ENDM
 
+
 MMove32:	MACRO
+	; -- MMove32 r1,r2
+	; -- Pop r2:r2' and push to r1:r1'
 	IF	__NARG==2
 		swap	\2
 		push	\1
@@ -61,6 +64,8 @@ MMove32:	MACRO
 		pop	\2
 		ld	\1,\2
 		pop	\2
+	ELSE
+		FAIL	"Two operands needed"
 	ENDC
 	ENDM
 
