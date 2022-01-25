@@ -170,23 +170,20 @@ tmp__\@ EQUS "ft"
 
 	; MPush32 r16,(ft)
 	IF __NARG==2&&"\2".lower=="(ft)"&&("\1".lower=="bc"||"\1".lower=="de"||"\1".lower=="hl")
-dst__\@ EQUS "\2".slice(1,2)
-hi__\@	EQUS |dst__\@|.slice(0,1)
-lo__\@	EQUS |dst__\@|.slice(1,1)
-		push	dst__\@
+hi__\@	EQUS "\1".slice(0,1)
+lo__\@	EQUS "\1".slice(1,1)
+		push	\1
 
 		ld	lo__\@,(ft)
 		add	ft,1
 		ld	hi__\@,(ft)
-		push	dst__\@
+		push	\1
 		add	ft,1
 
 		ld	lo__\@,(ft)
 		add	ft,1
 		ld	hi__\@,(ft)
 		sub	ft,1
-
-		PURGE	dst__\@
 		MEXIT
 	ENDC
 
