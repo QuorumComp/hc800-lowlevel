@@ -273,7 +273,7 @@ MathShiftLeft_32:
 
 		ld	t,16
 		sub	t,b
-		ld	c,t	; c = amount to right shift to get the part that is shifted into other word
+		ld	c,t	; c = amount to right shift to get the part that is shifted into high word
 
 		pop	ft
 
@@ -281,7 +281,7 @@ MathShiftLeft_32:
 		ld	de,ft
 		rs	ft,c
 		exg	de,ft	; de = part that spills into high word
-		rs	ft,b
+		ls	ft,b
 		swap	ft
 
 		ls	ft,b
