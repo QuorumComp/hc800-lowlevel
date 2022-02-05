@@ -115,6 +115,54 @@ lo__\@	EQUS "\2".slice(1,1)
 
 	ENDM
 
+MLoad32:	MACRO
+	; -- MLoad32 ft,(r)  note: r must not be FT
+	; -- Load little endian long word onto FT stack (overwriting current FT top, FT stack grows by one word)
+	; --
+	; -- MLoad32 r,(ft)  note: r must not be FT
+	; -- Load little endian long word onto R stack (overwriting current R top, R stack grows by one word)
+
+	; MLoad32 r16,(ft)
+	IF __NARG==2&&"\2".lower=="(ft)"&&("\1".lower=="bc"||"\1".lower=="de"||"\1".lower=="hl")
+hi__\@	EQUS "\1".slice(0,1)
+lo__\@	EQUS "\1".slice(1,1)
+		ld	lo__\@,(ft)
+		add	ft,1
+		ld	hi__\@,(ft)
+		push	\1
+		add	ft,1
+
+		ld	lo__\@,(ft)
+		add	ft,1
+		ld	hi__\@,(ft)
+		sub	ft,1
+		MEXIT
+	ENDC
+
+	; MLoad32 ft,(r16)
+	IF __NARG==2&&("\2".lower=="(bc)"||"\2".lower=="(de)"||"\2".lower=="(hl)")
+src__\@ EQUS "\2".slice(1,2)
+		add	src__\@,1
+		ld	t,\2
+		exg	f,t
+		sub	src__\@,1
+		ld	t,\2
+		push	ft
+
+		add	src__\@,3
+		ld	t,\2
+		exg	f,t
+		sub	src__\@,1
+		ld	t,\2
+
+		sub	src__\@,2
+		PURGE	src__\@
+		MEXIT
+	ENDC
+	FAIL "Invalid arguments for MLoad32"
+
+	ENDM
+
 MPush32:	MACRO
 	; -- MPush32 r
 	; -- Duplicate r:r'
@@ -122,8 +170,8 @@ MPush32:	MACRO
 	; -- MPush32 r1,r2   note: must not be same register
 	; -- Push r2:r2' onto r1 stack
 	; -- 
-	; -- MPush32 ft,(r)  note: r must not be FT
-	; -- Push little endian long word onto FT stack
+	; -- MPush32 r1,(r2) 
+	; -- Push little endian long word onto R1 stack
 	; --
 	; -- MPush32 r,(ft)  note: r must not be FT
 	; -- Push little endian long word onto r stack
