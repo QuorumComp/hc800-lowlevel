@@ -378,8 +378,10 @@ MathLog2_16:
 		dj	d,.loop
 
 		ld	f,FLAGS_NE
+		j	.exit
 
-.done		ld	t,d
+.done		ld	f,FLAGS_EQ
+.exit		ld	t,d
 		pop	bc/de
 		j	(hl)
 
