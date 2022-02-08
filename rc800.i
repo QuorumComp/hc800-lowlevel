@@ -121,9 +121,25 @@ MLoad32:	MACRO
 	; --
 	; -- MLoad32 r,(ft)  note: r must not be FT
 	; -- Load little endian long word onto R stack (overwriting current R top, R stack grows by one word)
+	; --
+	; -- MLoad32 r,n32
+	; -- Push 32 bit value onto r stack
+
+	; MLoad32 r16,(r16)
+	IF __NARG==2 && ("\2".lower=="(bc)"||"\2".lower=="(de)"||"\2".lower=="(hl)") && ("\1".lower=="bc"||"\1".lower=="de"||"\1".lower=="hl")
+src__\@		EQUS	"\2".slice(1,2)
+		IF	|src__\@|=="\1"
+			FAIL "Invalid operands"
+		ENDC
+		exg	ft,src__\@
+		MLoad32	\1,(ft)
+		exg	ft,src__\@
+		PURGE	src__\@
+		MEXIT
+	ENDC
 
 	; MLoad32 r16,(ft)
-	IF __NARG==2&&"\2".lower=="(ft)"&&("\1".lower=="bc"||"\1".lower=="de"||"\1".lower=="hl")
+	IF __NARG==2 && "\2".lower=="(ft)" && ("\1".lower=="bc"||"\1".lower=="de"||"\1".lower=="hl")
 hi__\@	EQUS "\1".slice(0,1)
 lo__\@	EQUS "\1".slice(1,1)
 		ld	lo__\@,(ft)
@@ -140,7 +156,7 @@ lo__\@	EQUS "\1".slice(1,1)
 	ENDC
 
 	; MLoad32 ft,(r16)
-	IF __NARG==2&&("\2".lower=="(bc)"||"\2".lower=="(de)"||"\2".lower=="(hl)")
+	IF __NARG==2 && "\1".lower=="ft" && ("\2".lower=="(bc)"||"\2".lower=="(de)"||"\2".lower=="(hl)")
 src__\@ EQUS "\2".slice(1,2)
 		add	src__\@,1
 		ld	t,\2
@@ -159,6 +175,17 @@ src__\@ EQUS "\2".slice(1,2)
 		PURGE	src__\@
 		MEXIT
 	ENDC
+
+	;MLoad32 r16,n32
+	IF __NARG==2&&("\1".lower=="ft"||"\1".lower=="bc"||"\1".lower=="de"||"\1".lower=="hl")
+		ld	\1,(\2)&$FFFF
+		push	\1
+		IF (((\2)>>16)&$FFFF)~=((\2)&$FFFF)
+			ld	\1,((\2)>>16)&$FFFF
+		ENDC
+		MEXIT
+	ENDC
+
 	FAIL "Invalid arguments for MLoad32"
 
 	ENDM
@@ -217,68 +244,16 @@ tmp__\@ EQUS "ft"
 	ENDC
 
 	; MPush32 r16,(ft)
-	IF __NARG==2&&"\2".lower=="(ft)"&&("\1".lower=="bc"||"\1".lower=="de"||"\1".lower=="hl")
-hi__\@	EQUS "\1".slice(0,1)
-lo__\@	EQUS "\1".slice(1,1)
+	IF __NARG==2 && ("\2".lower=="(ft)"||"\2".lower=="(bc)"||"\2".lower=="(de)"||"\2".lower=="(hl)") && ("\1".lower=="ft"||"\1".lower=="bc"||"\1".lower=="de"||"\1".lower=="hl")
 		push	\1
-
-		ld	lo__\@,(ft)
-		add	ft,1
-		ld	hi__\@,(ft)
-		push	\1
-		add	ft,1
-
-		ld	lo__\@,(ft)
-		add	ft,1
-		ld	hi__\@,(ft)
-		sub	ft,1
-		MEXIT
-	ENDC
-
-	; MPush32 ft,(r16)
-	IF __NARG==2&&("\2".lower=="(bc)"||"\2".lower=="(de)"||"\2".lower=="(hl)")
-		IF "\1".lower~="ft")
-			MPush32	ft,\2
-			MMove32	\2,\1
-			swap	ft
-			push	\1
-			ld	\1,ft
-			pop	ft
-			push	\1
-			ld	\1,ft
-			pop	ft
-			MEXIT
-		ENDC
-
-src__\@ EQUS "\2".slice(1,2)
-		push	ft
-
-		add	src__\@,1
-		ld	t,\2
-		exg	f,t
-		sub	src__\@,1
-		ld	t,\2
-		push	ft
-
-		add	src__\@,3
-		ld	t,\2
-		exg	f,t
-		sub	src__\@,1
-		ld	t,\2
-
-		sub	src__\@,2
-		PURGE	src__\@
+		MLoad32	\1,\2
 		MEXIT
 	ENDC
 
 	;MPush32 r16,n32
-	IF __NARG==2&&("\1".lower=="ft"||"\1".lower=="bc"||"\1".lower=="de"||"\1".lower=="hl")
+	IF __NARG==2 && ("\1".lower=="ft"||"\1".lower=="bc"||"\1".lower=="de"||"\1".lower=="hl")
 		push	\1
-		ld	\1,(\2)&$FFFF
-		push	\1
-		IF (((\2)>>16)&$FFFF)~=((\2)&$FFFF)
-			ld	\1,((\2)>>16)&$FFFF
-		ENDC
+		MLoad32 \1,\2
 		MEXIT
 	ENDC
 
