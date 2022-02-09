@@ -40,9 +40,9 @@ SetMemoryWords:
 ; -- Fill memory with byte value
 ; --
 ; -- Input:
+; --    t - value
 ; --   bc - destination
 ; --   de - number of bytes to set
-; --    t - value
 ; --
 		SECTION	"SetMemory",CODE
 SetMemory:
