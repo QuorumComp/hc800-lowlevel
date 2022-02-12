@@ -33,6 +33,40 @@ FLAGS_NE	EQU	FLAGS_NZ
 FLAGS_EQ	EQU	FLAGS_Z
 
 
+MCopy:	MACRO	;dreg, sreg, count
+		pusha
+	IF "\1".lower=="\2".lower
+		FAIL "Destination and source can't be the same register"
+	ENDC
+	IF "\1".lower=="hl" || "\2".lower=="hl"
+		FAIL "HL can't be used as source or destination"
+	ENDC
+	IF "\1".lower=="ft"
+__d\@		EQUS "hl"
+		ld	hl,ft
+	ELSE
+__d\@		EQUS "\1"
+	ENDC
+	IF "\2".lower=="ft"
+__s\@		EQUS "hl"
+		ld	hl,ft
+	ELSE
+__s\@		EQUS "\2"
+	ENDC
+	IF (\3)>256
+		FAIL "Count must be <= 256"
+	ENDC
+		ld	f,(\3)&$FF
+.loop\@
+		ld	t,(__s\@)
+		ld	(__d\@),t
+		add	__s\@,1
+		add	__d\@,1
+		dj	f,.loop\@
+		popa
+	ENDM
+
+
 ; -- Load 16 bit register with immediate loop count for nested DJ's
 MLDLoop:	MACRO	;reg16,count
 	ld	\1,((((\2)-1)>>8+1)<<8)|((\2)&$FF)
