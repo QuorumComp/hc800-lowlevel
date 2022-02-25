@@ -390,10 +390,8 @@ MathLog2_16:
 ; -- Store value in FT:FT' as little endian 32 bit value
 ; --
 ; -- Inputs:
+; --   ft:ft' - integer (consumed)
 ; --   bc - pointer to value
-; --
-; -- Outputs:
-; --   ft:ft' consumed
 ; --
 		SECTION	"MathStoreLong",CODE
 MathStoreLong:
@@ -414,7 +412,6 @@ MathStoreLong:
 		ld	(bc),t
 
 		sub	bc,1
-		pop	ft
 
 		j	(hl)
 
@@ -450,7 +447,7 @@ MathLoadUWord:
 ; --
 		SECTION	"MathLoadLong",CODE
 MathLoadLong:
-		MPush32	ft,(bc)
+		MLoad32	ft,(bc)
 		j	(hl)
 
 
