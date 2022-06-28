@@ -268,7 +268,13 @@ MathAdd_32_32:
 MathShiftLeft_32:
 		push	ft-de
 
-		cmp	b,16	; shift more than 16 positions?
+		cmp	b,0	; Don't shift?
+		j/ne	.not_zero
+
+		pop	ft-de
+		j	(hl)
+
+.not_zero	cmp	b,16	; shift more than 16 positions?
 		j/geu	.simple
 
 		ld	t,16
@@ -317,7 +323,13 @@ MathShiftLeft_32:
 MathShiftRight_32:
 		push	ft-de
 
-		cmp	b,16	; shift more than 16 positions?
+		cmp	b,0	; Don't shift?
+		j/ne	.not_zero
+		
+		pop	ft-de
+		j	(hl)
+
+.not_zero	cmp	b,16	; shift more than 16 positions?
 		j/geu	.simple
 
 		ld	t,16
