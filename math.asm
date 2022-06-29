@@ -48,20 +48,20 @@ MathMultiplyUnsigned_32x16_p32:
 
 		lio	t,(de)
 		exg	f,t
-		lio	t,(ft)
+		lio	t,(de)
 		exg	f,t
 		ld	bc,ft
 		push	bc
 
 		lio	t,(de)
 		exg	f,t
-		lio	t,(ft)
+		lio	t,(de)
 		exg	f,t
 		ld	bc,ft
 
 		; load hi word of multiplicand
 
-		ld	e,IO_MATH_Y
+		ld	e,IO_MATH_X
 		pop	ft
 		exg	f,t
 		lio	(de),t
@@ -74,14 +74,11 @@ MathMultiplyUnsigned_32x16_p32:
 		ld	t,MATH_OP_UNSIGNED_MUL
 		lio	(de),t
 
-		; load result into pointer
+		; load result (ignore high word) into ft:ft'
 
 		ld	e,IO_MATH_Z
 
-		lio	t,(de)
-		exg	f,t
-		lio	t,(de)
-		exg	f,t
+		ld	ft,0
 		push	ft
 		lio	t,(de)
 		exg	f,t

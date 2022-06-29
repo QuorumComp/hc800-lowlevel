@@ -113,6 +113,7 @@ MPop32:	MACRO
 	; -- MPop32 (r),ft  note: r must not be FT
 	IF __NARG==2&&"\2".lower=="ft"&&("\1".lower=="(bc)"||"\1".lower=="(de)"||"\1".lower=="(hl)")
 dst__\@ EQUS "\1".slice(1,2)
+		swap	ft
 		ld	\1,t
 		add	dst__\@,1
 		exg	f,t
