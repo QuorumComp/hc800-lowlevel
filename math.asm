@@ -2,6 +2,8 @@
 		INCLUDE	"math.i"
 		INCLUDE	"rc800.i"
 
+
+
 ; ---------------------------------------------------------------------------
 ; -- Multiply two integers
 ; --
@@ -146,11 +148,70 @@ MathMultiplyUnsigned_16x16_p32:
 ; --
 		SECTION	"MathDivideUnsigned_32by16_q16_r16",CODE
 MathDivideUnsigned_32by16_q16_r16:
-		push	hl/bc
-		ld	c,MATH_OP_UNSIGNED_DIV
-		swap	bc
-		jal	divide
-		pop	hl
+		push	bc-hl
+
+		ld	d,IO_MATH_BASE
+
+		; load Z with dividend
+
+		ld	e,IO_MATH_Z
+		push	ft
+		ld	t,0
+		lio	(de),t
+		lio	(de),t
+		lio	(de),t
+		lio	(de),t
+		pop	ft
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+		pop	ft
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+
+		; load Y with divisor
+
+		ld	e,IO_MATH_Y
+		ld	t,0
+		lio	(de),t
+		lio	(de),t
+		ld	ft,bc
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+
+		; start operation
+
+		ld	e,IO_MATH_OPERATION
+		ld	t,MATH_OP_UNSIGNED_DIV
+		lio	(de),t
+
+		nop
+		nop
+		nop
+
+		; get quotient
+
+		ld	e,IO_MATH_X
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+		push	ft
+
+		; get remainder
+
+		ld	e,IO_MATH_Y
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+
+		pop	bc-hl
 		j	(hl)
 
 
@@ -167,13 +228,72 @@ MathDivideUnsigned_32by16_q16_r16:
 ; --
 		SECTION	"MathDivideSigned_32by16_q16_r16",CODE
 MathDivideSigned_32by16_q16_r16:
-		push	hl/bc
-		ld	c,MATH_OP_SIGNED_DIV
-		swap	bc
-		jal	divide
-		pop	hl
-		j	(hl)
+		push	bc-hl
 
+		ld	d,IO_MATH_BASE
+
+		; load Z with dividend
+
+		ld	e,IO_MATH_Z
+		push	ft
+		rsa	ft,15	; sign extend
+		lio	(de),t
+		lio	(de),t
+		lio	(de),t
+		lio	(de),t
+		pop	ft
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+		pop	ft
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+
+		; load Y with divisor
+
+		ld	e,IO_MATH_Y
+		ld	ft,bc
+		rsa	ft,15	; sign extend
+		lio	(de),t
+		lio	(de),t
+		ld	ft,bc
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+
+		; start operation
+
+		ld	e,IO_MATH_OPERATION
+		ld	t,MATH_OP_SIGNED_DIV
+		lio	(de),t
+
+		nop
+		nop
+		nop
+
+		; get quotient
+
+		ld	e,IO_MATH_X
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+		push	ft
+
+		; get remainder
+
+		ld	e,IO_MATH_Y
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+
+		pop	bc-hl
+		j	(hl)
 
 ; ---------------------------------------------------------------------------
 ; -- Add two 32 bit integers
@@ -579,75 +699,3 @@ multiply:
 		j	(hl)
 
 
-; ---------------------------------------------------------------------------
-; -- Divide two integers
-; --
-; -- Inputs:
-; --   ft:ft' - dividend
-; --   bc     - divisor
-; --   bc'    - operation
-; --
-; -- Outputs:
-; --   ft:ft' consumed
-; --   bc' consumed
-; --
-; --   ft  - remainder
-; --   ft' - quotient
-; --   bc  - divisor
-; --
-
-		SECTION	"MathDivideCommon",CODE
-divide:		push	de
-
-		ld	d,IO_MATH_BASE
-
-		; load Z with dividend
-		ld	e,IO_MATH_Z
-		exg	f,t
-		lio	(de),t
-		exg	f,t
-		lio	(de),t
-
-		pop	ft
-
-		exg	f,t
-		lio	(de),t
-		exg	f,t
-		lio	(de),t
-
-		; load Y with divisor
-		ld	e,IO_MATH_Y
-		ld	t,b
-		lio	(de),t
-		ld	t,c
-		lio	(de),t
-
-		; divide
-		swap	bc
-		ld	e,IO_MATH_OPERATION
-		ld	t,c
-		lio	(de),t
-		pop	bc
-
-		nop
-
-		; get quotient
-
-		ld	e,IO_MATH_X
-
-		lio	t,(de)
-		exg	f,t
-		lio	t,(de)
-		exg	f,t
-		push	ft
-
-		; get remainder
-
-		ld	e,IO_MATH_Y
-		lio	t,(de)
-		exg	f,t
-		lio	t,(de)
-		exg	f,t
-
-		pop	de
-		j	(hl)
