@@ -9,7 +9,7 @@
 ; --
 ; -- Inputs:
 ; --   ft:ft' - multiplicand (consumed)
-; --       bc - multiplier
+; --   bc     - multiplier
 ; --
 ; -- Outputs:
 ; --   ft:ft' - result
@@ -18,80 +18,142 @@
 MathMultiplyUnsigned_32x16_p32:
 		push	bc-hl
 
+		ld	bc,0
+		jal	MathMultiplyUnsigned_32x32_p32
+
+		pop	bc-hl
+		j	(hl)
+
+
+; ---------------------------------------------------------------------------
+; -- Multiply two integers
+; --
+; -- Inputs:
+; --   ft:ft' - multiplicand (consumed)
+; --   bc:bc' - multiplier
+; --
+; -- Outputs:
+; --   ft:ft' - result
+; --
+		SECTION	"MathMultiplySigned_32x32_p32",CODE
+MathMultiplySigned_32x32_p32:
+		push	de-hl
+
 		ld	d,IO_MATH_BASE
 
-		; load low word of multiplicand into X
-
-		swap	ft
-
+		; load multiplicand into X
 		ld	e,IO_MATH_X
 		exg	f,t
 		lio	(de),t
 		exg	f,t
 		lio	(de),t
-
-		; load multiplier into Y
-
-		ld	e,IO_MATH_Y
-		ld	t,b
-		lio	(de),t
-		ld	t,c
-		lio	(de),t
-
-		; multiply
-
-		ld	e,IO_MATH_OPERATION
-		ld	t,MATH_OP_UNSIGNED_MUL
-		lio	(de),t
-
-		; load result into bc:bc'
-
-		ld	e,IO_MATH_Z
-
-		lio	t,(de)
-		exg	f,t
-		lio	t,(de)
-		exg	f,t
-		ld	bc,ft
-		push	bc
-
-		lio	t,(de)
-		exg	f,t
-		lio	t,(de)
-		exg	f,t
-		ld	bc,ft
-
-		; load hi word of multiplicand
-
-		ld	e,IO_MATH_X
 		pop	ft
 		exg	f,t
 		lio	(de),t
 		exg	f,t
 		lio	(de),t
 
-		; multiply
+		; load multiplier into Y
+		ld	e,IO_MATH_Y
+		ld	t,b
+		lio	(de),t
+		ld	t,c
+		lio	(de),t
+		swap	bc
+		ld	t,b
+		lio	(de),t
+		ld	t,c
+		lio	(de),t
+		swap	bc
 
+		; multiply
 		ld	e,IO_MATH_OPERATION
-		ld	t,MATH_OP_UNSIGNED_MUL
+		ld	t,MATH_OP_SIGNED_MUL
 		lio	(de),t
 
-		; load result (ignore high word) into ft:ft'
+		nop
+		nop
+		nop
 
+		; load Z into ft:ft'
 		ld	e,IO_MATH_Z
-
-		ld	ft,0
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
 		push	ft
 		lio	t,(de)
 		exg	f,t
 		lio	t,(de)
 		exg	f,t
 
-		; add results
-		jal	MathAdd_32_32
-		pop	bc	; discard operand
+		pop	de-hl
+		j	(hl)
 
-		pop	bc-hl
+
+; ---------------------------------------------------------------------------
+; -- Multiply two integers
+; --
+; -- Inputs:
+; --   ft:ft' - multiplicand (consumed)
+; --   bc:bc' - multiplier
+; --
+; -- Outputs:
+; --   ft:ft' - result
+; --
+		SECTION	"MathMultiplyUnsigned_32x32_p32",CODE
+MathMultiplyUnsigned_32x32_p32:
+		push	de-hl
+
+		ld	d,IO_MATH_BASE
+
+		; load multiplicand into X
+		ld	e,IO_MATH_X
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+		pop	ft
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+
+		; load multiplier into Y
+		ld	e,IO_MATH_Y
+		ld	t,b
+		lio	(de),t
+		ld	t,c
+		lio	(de),t
+		swap	bc
+		ld	t,b
+		lio	(de),t
+		ld	t,c
+		lio	(de),t
+		swap	bc
+
+		; multiply
+		ld	e,IO_MATH_OPERATION
+		ld	t,MATH_OP_UNSIGNED_MUL
+		lio	(de),t
+
+		nop
+		nop
+		nop
+
+		; load Z into ft:ft'
+		ld	e,IO_MATH_Z
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+		push	ft
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+
+		pop	de-hl
 		j	(hl)
 
 
@@ -107,12 +169,22 @@ MathMultiplyUnsigned_32x16_p32:
 ; --
 		SECTION	"MathMultiplySigned_16x16_p32",CODE
 MathMultiplySigned_16x16_p32:
-		push	bc/hl
-		ld	c,MATH_OP_SIGNED_MUL
-		swap	bc
-		jal	multiply
-		pop	hl
+		pusha
+
+		j	@+2
+
+		rsa	ft,15
+		push	ft
+		ld	ft,bc
+		rsa	ft,15
+		ld	bc,ft
+		pop	ft
+		jal	MathMultiplySigned_32x32_p32
+
+		pop	bc-hl
 		j	(hl)
+
+
 
 
 ; ---------------------------------------------------------------------------
@@ -127,11 +199,13 @@ MathMultiplySigned_16x16_p32:
 ; --
 		SECTION	"MathMultiplyUnsigned_16x16_p32",CODE
 MathMultiplyUnsigned_16x16_p32:
-		push	bc/hl
-		ld	c,MATH_OP_UNSIGNED_MUL
-		swap	bc
-		jal	multiply
-		pop	hl
+		pusha
+
+		ld	ft,0
+		ld	bc,0
+		jal	MathMultiplyUnsigned_32x32_p32
+
+		pop	bc-hl
 		j	(hl)
 
 
@@ -630,72 +704,6 @@ MathCompareLong:
 		swap	bc
 		swap	ft
 		pop	ft
-		j	(hl)
-
-
-; ---------------------------------------------------------------------------
-; -- PRIVATE FUNCTIONS
-; ---------------------------------------------------------------------------
-
-; ---------------------------------------------------------------------------
-; -- Multiply two integers
-; --
-; -- Inputs:
-; --   ft - integer #1
-; --   bc - integer #2
-; --   bc'    - operation
-; --
-; -- Outputs:
-; --   ft:ft' consumed
-; --   bc' consumed
-; --
-; --   ft:ft' - 32 bit result
-; --
-		SECTION	"MathMultiplyCommon",CODE
-multiply:
-		push	de
-
-		ld	d,IO_MATH_BASE
-
-		; load X with integer #1
-		ld	e,IO_MATH_X
-		exg	f,t
-		lio	(de),t
-		exg	f,t
-		lio	(de),t
-
-		; load Y with integer #1
-		ld	e,IO_MATH_Y
-		ld	t,b
-		lio	(de),t
-		ld	t,c
-		lio	(de),t
-
-		; multiply
-		swap	bc
-		ld	t,c
-		pop	bc
-		
-		ld	e,IO_MATH_OPERATION
-		lio	(de),t
-
-		nop
-		ld	e,IO_MATH_Z
-
-		; get low word of result
-		lio	t,(de)
-		exg	f,t
-		lio	t,(de)
-		exg	f,t
-		push	ft
-
-		; get high word of result
-		lio	t,(de)
-		exg	f,t
-		lio	t,(de)
-		exg	f,t
-
-		pop	de
 		j	(hl)
 
 

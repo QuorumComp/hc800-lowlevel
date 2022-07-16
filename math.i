@@ -26,8 +26,10 @@ MSignExtend:	MACRO	;FT
 	GLOBAL	MathCopy_32
 
 	GLOBAL	MathMultiplySigned_16x16_p32
+	GLOBAL	MathMultiplySigned_32x32_p32
 	GLOBAL	MathMultiplyUnsigned_16x16_p32
 	GLOBAL	MathMultiplyUnsigned_32x16_p32
+	GLOBAL	MathMultiplyUnsigned_32x32_p32
 	GLOBAL	MathDivideSigned_32by16_q16_r16
 	GLOBAL	MathDivideUnsigned_32by16_q16_r16
 
