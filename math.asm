@@ -171,8 +171,6 @@ MathMultiplyUnsigned_32x32_p32:
 MathMultiplySigned_16x16_p32:
 		pusha
 
-		j	@+2
-
 		rsa	ft,15
 		push	ft
 		ld	ft,bc
