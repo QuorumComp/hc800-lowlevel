@@ -293,6 +293,100 @@ MathDivideUnsigned_32by16_q16_r16:
 ; -- Divide two integers
 ; --
 ; -- Inputs:
+; --   ft:ft' - dividend (consumed)
+; --   bc:bc' - divisor
+; --
+; -- Outputs:
+; --   ft:ft'     - remainder
+; --   ft'':ft''' - quotient
+; --
+		SECTION	"MathDivideUnsigned_32by32_q32_r32",CODE
+MathDivideUnsigned_32by32_q32_r32:
+		push	de
+
+		ld	d,IO_MATH_BASE
+
+		; load Z with dividend
+
+		ld	e,IO_MATH_Z
+		push	ft
+		ld	t,0
+		lio	(de),t
+		lio	(de),t
+		lio	(de),t
+		lio	(de),t
+		pop	ft
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+		pop	ft
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+
+		; load Y with divisor
+
+		ld	e,IO_MATH_Y
+		ld	ft,bc
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+		swap	bc
+		ld	ft,bc
+		exg	f,t
+		lio	(de),t
+		exg	f,t
+		lio	(de),t
+		swap	bc
+
+		; start operation
+
+		ld	e,IO_MATH_OPERATION
+		ld	t,MATH_OP_UNSIGNED_DIV
+		lio	(de),t
+
+		nop
+		nop
+		nop
+
+		; get quotient
+
+		ld	e,IO_MATH_X
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+		push	ft
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+		push	ft
+
+		; get remainder
+
+		ld	e,IO_MATH_Y
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+		push	ft
+		lio	t,(de)
+		exg	f,t
+		lio	t,(de)
+		exg	f,t
+
+		pop	de
+		j	(hl)
+
+
+; ---------------------------------------------------------------------------
+; -- Divide two integers
+; --
+; -- Inputs:
 ; --   ft:ft' - dividend
 ; --   bc     - divisor
 ; --
