@@ -48,4 +48,6 @@ MSignExtend:	MACRO	;FT
 	GLOBAL	MathDupLong
 	GLOBAL	MathCompareLong
 
+	GLOBAL	DecimalLongWidth
+
 	ENDC

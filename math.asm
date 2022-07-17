@@ -799,3 +799,48 @@ MathCompareLong:
 		j	(hl)
 
 
+; ---------------------------------------------------------------------------
+; -- Determine length of long word value in decimal characters
+; --
+; -- Inputs:
+; --   ft:ft' - value (consumed)
+; --
+; -- Output:
+; --   t - length in characters
+; --
+		SECTION	"DecimalLongWidth",CODE
+DecimalLongWidth:
+		push	bc-hl
+
+		ld	e,1
+.loop
+		ld	bc,10
+		push	bc
+		ld	bc,0
+		jal	MathDivideUnsigned_32by32_q32_r32
+		pop	ft
+		pop	ft
+		pop	bc
+
+		swap	ft
+		ld	bc,ft
+		swap	ft
+		push	ft
+		or	t,b
+		or	t,c
+		tst	ft
+		j/z	.done
+
+		add	e,1
+		pop	ft
+		j	.loop
+
+.done
+		pop	ft
+		pop	ft
+		ld	t,e
+		pop	bc-hl
+		j	(hl)
+
+
+
