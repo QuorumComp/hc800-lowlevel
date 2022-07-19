@@ -462,6 +462,27 @@ MathDivideSigned_32by16_q16_r16:
 		j	(hl)
 
 ; ---------------------------------------------------------------------------
+; -- Increment 32 bit integer
+; --
+; -- Inputs:
+; --   ft:ft' - integer (consumed)
+; --
+; -- Outputs:
+; --   ft:ft' - integer
+; --
+		SECTION	"MathInc_32",CODE
+MathInc_32:
+		push	bc/hl
+		ld	bc,1
+		push	bc
+		ld	bc,0
+		jal	MathAdd_32_32
+		pop	bc
+		pop	bc/hl
+		j	(hl)
+
+		
+; ---------------------------------------------------------------------------
 ; -- Add two 32 bit integers
 ; --
 ; -- Inputs:

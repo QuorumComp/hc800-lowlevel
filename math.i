@@ -35,6 +35,7 @@ MSignExtend:	MACRO	;FT
 	GLOBAL	MathDivideUnsigned_32by32_q32_r32
 
 	GLOBAL	MathAdd_32_32
+	GLOBAL	MathInc_32
 
 	GLOBAL	MathShiftLeft_32
 	GLOBAL	MathShiftRight_32
