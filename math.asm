@@ -462,6 +462,42 @@ MathDivideSigned_32by16_q16_r16:
 		j	(hl)
 
 ; ---------------------------------------------------------------------------
+; -- Negate 32 bit integer
+; --
+; -- Inputs:
+; --   ft:ft' - integer (consumed)
+; --
+; -- Outputs:
+; --   ft:ft' - integer
+; --
+		SECTION	"MathNeg_32",CODE
+MathNeg_32:
+		push	hl
+		jal	MathNot_32
+		jal	MathInc_32
+		pop	hl
+		j	(hl)
+
+		
+; ---------------------------------------------------------------------------
+; -- Invert all bits of 32 bit integer
+; --
+; -- Inputs:
+; --   ft:ft' - integer (consumed)
+; --
+; -- Outputs:
+; --   ft:ft' - integer
+; --
+		SECTION	"MathNot_32",CODE
+MathNot_32:
+		swap	ft
+		not	ft
+		swap	ft
+		not	ft
+		j	(hl)
+
+		
+; ---------------------------------------------------------------------------
 ; -- Increment 32 bit integer
 ; --
 ; -- Inputs:
@@ -481,7 +517,36 @@ MathInc_32:
 		pop	bc/hl
 		j	(hl)
 
-		
+
+; ---------------------------------------------------------------------------
+; -- Sub two 32 bit integers
+; --
+; -- Inputs:
+; --   ft:ft' - integer #1 (consumed)
+; --   bc:bc' - integer #2
+; --
+; -- Outputs:
+; --   ft:ft' - integer
+; --
+		SECTION	"MathSub_32_32",CODE
+MathSub_32_32:
+		push	hl
+		MPush32	bc
+
+		exg	ft,bc
+		swap	ft/bc
+		exg	ft,bc
+		swap	ft/bc
+
+		jal	MathNeg_32
+		jal	MathAdd_32_32
+
+		pop	bc
+		pop	bc
+		pop	hl
+		j	(hl)
+
+
 ; ---------------------------------------------------------------------------
 ; -- Add two 32 bit integers
 ; --
