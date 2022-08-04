@@ -880,8 +880,6 @@ MathCompareLong:
 		ld	f,t
 
 		swap	bc
-		swap	ft
-		pop	ft
 		j	(hl)
 
 
