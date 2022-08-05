@@ -508,13 +508,26 @@ MathNot_32:
 ; --
 		SECTION	"MathInc_32",CODE
 MathInc_32:
-		push	bc/hl
-		ld	bc,1
 		push	bc
-		ld	bc,0
-		jal	MathAdd_32_32
+
+		swap	ft
+		ld	bc,ft
+		add	bc,1
+		tst	bc
+		j/eq	.carry
+
+		ld	ft,bc
+		swap	ft
+
 		pop	bc
-		pop	bc/hl
+		j	(hl)
+
+.carry		
+		ld	ft,bc
+		swap	ft
+		add	ft,1
+
+		pop	bc
 		j	(hl)
 
 
