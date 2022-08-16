@@ -176,6 +176,10 @@ IO_SDCARD_BASE		EQU	$06
 IO_SD_DATA		EQU	$00
 IO_SD_STATUS		EQU	$01
 
+; fast mode: 4 bus cycles/bit, 32/byte (4 ins), SPI clk 3.375 MHz
+; slow mode: 64 bus cycles/bit, 512/byte (64 ins), SPI clk 210.9375 kHz
+
+IO_STAT_SLOW		EQU	$10
 IO_STAT_SELECT1		EQU	$08
 IO_STAT_SELECT0		EQU	$04
 IO_STAT_OUT_ACTIVE	EQU	$02	; read only
