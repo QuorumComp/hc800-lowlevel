@@ -7,7 +7,7 @@ HC800_I_INCLUDED_ = 1
 ; --
 
 ; The palette bank index
-BANK_PALETTE		EQU	$38
+BANK_PALETTE		EQU	$42
 PALETTE_SIZEOF		EQU	$200
 
 DRGB	MACRO
@@ -17,7 +17,7 @@ DRGB	MACRO
 	ENDM
 
 ; The attribute memory index
-BANK_ATTRIBUTE		EQU	$3C
+BANK_ATTRIBUTE		EQU	$43
 ATTRIBUTES_SIZEOF	EQU	$2000
 
 ; Client executable banks
