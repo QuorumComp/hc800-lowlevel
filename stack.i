@@ -6,7 +6,7 @@ LOWLEVEL_STACK_I_INCLUDED__ = 1
 ; ---------------------------------------------------------------------------
 ; -- Allocate and initialize a stack
 ; --
-MStackInit:	MACRO	;size
+MStackInit:	MACRO	;size,group
 		pusha
 		ld	ft,StackArea
 		ld	bc,StackPointer
@@ -15,7 +15,7 @@ MStackInit:	MACRO	;size
 		ld	(ft),b
 		popa
 		PUSHS
-		SECTION	"StackArea",BSS_S
+		SECTION	"StackArea",\2
 StackArea:	DS	\1
 StackPointer::	DS	2
 		POPS

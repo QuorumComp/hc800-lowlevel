@@ -44,26 +44,26 @@ MCopy:	MACRO	;dreg, sreg, count
 		FAIL "HL can't be used as source or destination"
 	ENDC
 	IF "\1".lower=="ft"
-__d\@		EQUS "hl"
+.d\@		EQUS "hl"
 		ld	hl,ft
 	ELSE
-__d\@		EQUS "\1"
+.d\@		EQUS "\1"
 	ENDC
 	IF "\2".lower=="ft"
-__s\@		EQUS "hl"
+.s\@		EQUS "hl"
 		ld	hl,ft
 	ELSE
-__s\@		EQUS "\2"
+.s\@		EQUS "\2"
 	ENDC
 	IF (\3)>256
 		FAIL "Count must be <= 256"
 	ENDC
 		ld	f,(\3)&$FF
 .loop\@
-		ld	t,(__s\@)
-		ld	(__d\@),t
-		add	__s\@,1
-		add	__d\@,1
+		ld	t,(.s\@)
+		ld	(.d\@),t
+		add	.s\@,1
+		add	.d\@,1
 		dj	f,.loop\@
 		popa
 	ENDM
@@ -75,17 +75,17 @@ MLDLoop:	MACRO	;reg16,count
 	ENDM
 
 MDelay:	MACRO	;microseconds
-loopCount\@ = (\1)**1.68 ;adjust for frequency and IPC
-	IF	loopCount\@>$10000
-		ERROR	"Loop count too large ({loopCount\@})"
+.loopCount\@ = (\1)**1.68 ;adjust for frequency and IPC
+	IF	.loopCount\@>$10000
+		ERROR	"Loop count too large ({.loopCount\@})"
 	ELSE
 		push	ft
-		MLDLoop	ft,loopCount\@
+		MLDLoop	ft,.loopCount\@
 .loop\@		dj	t,.loop\@
 		dj	f,.loop\@	
 		pop	ft
 	ENDC
-	PURGE	loopCount\@
+	PURGE	.loopCount\@
 	ENDM
 
 
