@@ -8,8 +8,8 @@ LOWLEVEL_STACK_I_INCLUDED__ = 1
 ; --
 MStackInit:	MACRO	;size,group
 		pusha
-		ld	ft,StackArea
-		ld	bc,StackPointer
+		ld	bc,StackArea
+		ld	ft,StackPointer
 		ld	(ft),c
 		add	ft,1
 		ld	(ft),b

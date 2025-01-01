@@ -23,7 +23,7 @@ ASSEMBLE = $(ASM) $(DEPFLAGS) $(ASMFLAGS)
 
 $(TARGET) : $(notdir $(SRCS:asm=obj))
 	@echo "\033[1;33m Collect\033[0m $(@F)"
-#	@$(LIB) $@ a $+
+	@$(LIB) $@ a $+
 
 %.obj : %.asm
 %.obj : %.asm $(DEPDIR)/%.d
