@@ -1,5 +1,4 @@
-	IFND	LOWLEVEL_STACK_I_INCLUDED__
-LOWLEVEL_STACK_I_INCLUDED__ = 1
+	INCLUDE	ONCE
 
 	GLOBAL	StackPointer
 
@@ -58,5 +57,3 @@ MStackFree:	MACRO	;size
 		ld	(ft),c
 		popa
 		ENDM
-
-	ENDC

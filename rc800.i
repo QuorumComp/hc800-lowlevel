@@ -1,6 +1,4 @@
-	IFND	RC800_I_INCLUDED_
-
-RC800_I_INCLUDED_ = 1
+		INCLUDE	ONCE
 
 
 		RSRESET
@@ -295,5 +293,5 @@ tmp__\@ EQUS "ft"
 	ENDC
 
 	FAIL "Invalid arguments for MPush32"
-
 	ENDM
+	

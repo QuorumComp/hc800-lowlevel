@@ -1,6 +1,4 @@
-	IFND	MATH_I_INCLUDED_
-
-MATH_I_INCLUDED_ = 1
+	INCLUDE	ONCE
 
 MInt32:	MACRO	;integer
 	DB	(\1)&$FF
@@ -53,5 +51,3 @@ MSignExtend:	MACRO	;FT
 	GLOBAL	MathCompareLong
 
 	GLOBAL	DecimalLongWidth
-
-	ENDC
