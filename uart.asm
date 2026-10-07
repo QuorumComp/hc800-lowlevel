@@ -174,7 +174,7 @@ UartMemoryOutSync:
 ; --
 		SECTION	"UartMemoryInSync",CODE
 UartMemoryInSync:
-		push	bc-hl
+		push	bc/de/hl
 
 		tst	de
 		j/z	.empty
@@ -192,7 +192,7 @@ UartMemoryInSync:
 
 .empty		ld	f,FLAGS_EQ
 
-.exit		pop	bc-hl
+.exit		pop	bc/de/hl
 		j	(hl)
 
 

@@ -16,12 +16,12 @@
 ; --
 		SECTION	"MathMultiplyUnsigned_32x16_p32",CODE
 MathMultiplyUnsigned_32x16_p32:
-		push	bc-hl
+		push	bc/de/hl
 
 		ld	bc,0
 		jal	MathMultiplyUnsigned_32x32_p32
 
-		pop	bc-hl
+		pop	bc/de/hl
 		j	(hl)
 
 
@@ -37,7 +37,7 @@ MathMultiplyUnsigned_32x16_p32:
 ; --
 		SECTION	"MathMultiplySigned_32x32_p32",CODE
 MathMultiplySigned_32x32_p32:
-		push	de-hl
+		push	de/hl
 
 		ld	d,IO_MATH_BASE
 
@@ -87,7 +87,7 @@ MathMultiplySigned_32x32_p32:
 		lio	t,(de)
 		exg	f,t
 
-		pop	de-hl
+		pop	de/hl
 		j	(hl)
 
 
@@ -103,7 +103,7 @@ MathMultiplySigned_32x32_p32:
 ; --
 		SECTION	"MathMultiplyUnsigned_32x32_p32",CODE
 MathMultiplyUnsigned_32x32_p32:
-		push	de-hl
+		push	de/hl
 
 		ld	d,IO_MATH_BASE
 
@@ -153,7 +153,7 @@ MathMultiplyUnsigned_32x32_p32:
 		lio	t,(de)
 		exg	f,t
 
-		pop	de-hl
+		pop	de/hl
 		j	(hl)
 
 
@@ -179,7 +179,7 @@ MathMultiplySigned_16x16_p32:
 		pop	ft
 		jal	MathMultiplySigned_32x32_p32
 
-		pop	bc-hl
+		pop	bc/de/hl
 		j	(hl)
 
 
@@ -203,7 +203,7 @@ MathMultiplyUnsigned_16x16_p32:
 		ld	bc,0
 		jal	MathMultiplyUnsigned_32x32_p32
 
-		pop	bc-hl
+		pop	bc/de/hl
 		j	(hl)
 
 
@@ -220,7 +220,7 @@ MathMultiplyUnsigned_16x16_p32:
 ; --
 		SECTION	"MathDivideUnsigned_32by16_q16_r16",CODE
 MathDivideUnsigned_32by16_q16_r16:
-		push	bc-hl
+		push	bc/de/hl
 
 		ld	d,IO_MATH_BASE
 
@@ -283,7 +283,7 @@ MathDivideUnsigned_32by16_q16_r16:
 		lio	t,(de)
 		exg	f,t
 
-		pop	bc-hl
+		pop	bc/de/hl
 		j	(hl)
 
 
@@ -394,7 +394,7 @@ MathDivideUnsigned_32by32_q32_r32:
 ; --
 		SECTION	"MathDivideSigned_32by16_q16_r16",CODE
 MathDivideSigned_32by16_q16_r16:
-		push	bc-hl
+		push	bc/de/hl
 
 		ld	d,IO_MATH_BASE
 
@@ -458,7 +458,7 @@ MathDivideSigned_32by16_q16_r16:
 		lio	t,(de)
 		exg	f,t
 
-		pop	bc-hl
+		pop	bc/de/hl
 		j	(hl)
 
 ; ---------------------------------------------------------------------------
@@ -572,7 +572,7 @@ MathSub_32_32:
 ; --
 		SECTION	"MathAdd_32_32",CODE
 MathAdd_32_32:
-		push	de-hl
+		push	de/hl
 
 		ld	l,2
 		ld	d,0
@@ -632,7 +632,7 @@ MathAdd_32_32:
 
 		; ft:ft' = result
 
-		pop	de-hl
+		pop	de/hl
 		j	(hl)
 
 
@@ -648,12 +648,12 @@ MathAdd_32_32:
 ; --
 		SECTION	"MathShiftLeft_32",CODE
 MathShiftLeft_32:
-		push	ft-de
+		push	ft/bc/de
 
 		cmp	b,0	; Don't shift?
 		j/ne	.not_zero
 
-		pop	ft-de
+		pop	ft/bc/de
 		j	(hl)
 
 .not_zero	cmp	b,16	; shift more than 16 positions?
@@ -703,12 +703,12 @@ MathShiftLeft_32:
 ; --
 		SECTION	"MathShiftRight_32",CODE
 MathShiftRight_32:
-		push	ft-de
+		push	ft/bc/de
 
 		cmp	b,0	; Don't shift?
 		j/ne	.not_zero
 		
-		pop	ft-de
+		pop	ft/bc/de
 		j	(hl)
 
 .not_zero	cmp	b,16	; shift more than 16 positions?
@@ -907,7 +907,7 @@ MathCompareLong:
 ; --
 		SECTION	"DecimalLongWidth",CODE
 DecimalLongWidth:
-		push	bc-hl
+		push	bc/de/hl
 
 		ld	e,1
 .loop
@@ -936,7 +936,7 @@ DecimalLongWidth:
 		pop	ft
 		pop	ft
 		ld	t,e
-		pop	bc-hl
+		pop	bc/de/hl
 		j	(hl)
 
 

@@ -10,7 +10,7 @@
 		SECTION	"CheckButtons",CODE
 
 CheckButtons:
-		push	bc-hl
+		push	bc/de/hl
 
 		ld	d,t
 		ld	b,IO_NEXYS3_BASE
@@ -19,7 +19,7 @@ CheckButtons:
 		and	t,d
 		cmp	d
 
-		pop	bc-hl
+		pop	bc/de/hl
 		j	(hl)
 
 
