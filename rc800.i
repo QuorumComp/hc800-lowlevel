@@ -33,6 +33,13 @@ FLAGS_EQ	EQU	FLAGS_Z
 FLAGS_LTU	EQU	FLAGS_CARRY
 
 
+MBreak:	MACRO	;emulator software breakpoint (debug builds only)
+	IF _DEBUG
+		j	@+1
+	ENDC
+	ENDM
+
+
 MCopy:	MACRO	;dreg, sreg, count
 		pusha
 	IF "\1".lower=="\2".lower
