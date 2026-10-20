@@ -1,9 +1,7 @@
 SRCS = math.asm memory.asm nexys3.asm uart.asm
 ASMFLAGS = -g -el -z0
 DEBUG ?= 0
-ifeq ($(DEBUG),1)
-ASMFLAGS += -D_DEBUG
-endif
+ASMFLAGS += -D _DEBUG=$(DEBUG)
 TARGET = lowlevel.lib
 
 ASM = motorrc8
